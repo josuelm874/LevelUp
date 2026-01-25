@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Level Up - Solo Leveling Style</title>
+    <link rel="stylesheet" href="System_style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="status-window">
+            <!-- Conteúdo Principal -->
+            <div class="window-content" id="windowContent">
+                <!-- Bordas douradas verticais (fora do content-section) -->
+                <div class="gold-border-left"></div>
+                <div class="gold-border-right"></div>
+                
+                <!-- Seção de Status -->
+                <div class="content-section active" id="statusSection">
+                    <!-- Partículas brancas pequenas no fundo -->
+                    <div class="star-particles" data-particles="status" id="starParticles"></div>
+                    
+                    <!-- Título principal (dentro do conteúdo) -->
+                    <div class="attribute-window-title">JANELA DE ATRIBUTO</div>
+                    
+                    <!-- Informações do Personagem -->
+                    <div class="character-info-section">
+                        <div class="char-stats-main">
+                            <div class="char-stat-box">
+                                <div class="char-stat-value-large" id="levelText">1</div>
+                                <div class="char-stat-label-small">Level</div>
+                            </div>
+                            <div class="char-stat-box">
+                                <div class="char-stat-value-large" id="rankText">F</div>
+                                <div class="char-stat-label-small">Rank</div>
+                            </div>
+                        </div>
+                        <div class="char-info-details">
+                            <div class="char-info-line">
+                                <span class="char-label">NOME:</span>
+                                <span class="char-value">NÃO DEFINIDO</span>
+                            </div>
+                            <div class="char-info-line">
+                                <span class="char-label">APELIDO:</span>
+                                <span class="char-value">NÃO DEFINIDO</span>
+                            </div>
+                            <div class="char-info-line">
+                                <span class="char-label">CLASSE:</span>
+                                <span class="char-value">NENHUMA</span>
+                            </div>
+                            <div class="char-info-line">
+                                <span class="char-label">TÍTULO:</span>
+                                <span class="char-value" id="currentTitleText">NENHUM</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Divisor -->
+                    <div class="section-divider"></div>
+                    
+                    <!-- Barras de HP, MP e EXP -->
+                    <div class="bars-section">
+                        <div class="bars-row">
+                            <div class="bar-container">
+                                <div class="bar-content">
+                                    <div class="bar-label">HP</div>
+                                    <div class="bar-wrapper">
+                                        <div class="bar-fill hp-bar" id="hpBar"></div>
+                                    </div>
+                                    <div class="bar-value" id="hpText">1000</div>
+                                </div>
+                            </div>
+                            <div class="bar-container">
+                                <div class="bar-content">
+                                    <div class="bar-label">MP</div>
+                                    <div class="bar-wrapper">
+                                        <div class="bar-fill mp-bar" id="mpBar"></div>
+                                    </div>
+                                    <div class="bar-value" id="mpText">500</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bar-container exp-container">
+                            <div class="bar-content">
+                                <div class="bar-label">EXP</div>
+                                <div class="bar-wrapper">
+                                    <div class="bar-fill exp-bar" id="expBar"></div>
+                                </div>
+                                <div class="bar-value" id="expText">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Divisor -->
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção ATRIBUTOS (2 colunas) - Sempre expandida -->
+                    <div class="attribute-section attributes-always-expanded">
+                        <div class="section-header">
+                            <span class="section-header-text">&lt;ATRIBUTOS&gt;</span>
+                        </div>
+                        <div class="section-content" style="display: block;">
+                            <div class="attributes-grid">
+                                <div class="attributes-column">
+                                    <div class="attribute-item" data-attr="forca">
+                                        <span class="attr-label">FORÇA +</span>
+                                        <span class="attr-value" data-attr="forca">0</span>
+                                    </div>
+                                    <div class="attribute-item" data-attr="inteligencia">
+                                        <span class="attr-label">INTELIGÊNCIA +</span>
+                                        <span class="attr-value" data-attr="inteligencia">0</span>
+                                    </div>
+                                    <div class="attribute-item" data-attr="agilidade">
+                                        <span class="attr-label">AGILIDADE +</span>
+                                        <span class="attr-value" data-attr="agilidade">0</span>
+                                    </div>
+                                </div>
+                                <div class="attributes-column">
+                                    <div class="attribute-item" data-attr="vitalidade">
+                                        <span class="attr-label">VITALIDADE +</span>
+                                        <span class="attr-value" data-attr="vitalidade">0</span>
+                                    </div>
+                                    <div class="attribute-item" data-attr="resistencia">
+                                        <span class="attr-label">RESISTÊNCIA +</span>
+                                        <span class="attr-value" data-attr="resistencia">0</span>
+                                    </div>
+                                    <div class="attribute-item" data-attr="percepcao">
+                                        <span class="attr-label">PERCEPÇÃO +</span>
+                                        <span class="attr-value" data-attr="percepcao">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <canvas id="hexagonChart" width="400" height="400"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Divisor -->
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção TÍTULO -->
+                    <div class="attribute-section">
+                        <div class="section-header">
+                            <span class="section-header-text">&lt;TÍTULO&gt;</span>
+                            <span class="section-chevron">▲</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-text">NENHUM</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Divisor -->
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção INFORMAÇÕES DE PROGRESSO -->
+                    <div class="attribute-section">
+                        <div class="section-header">
+                            <span class="section-header-text">&lt;INFORMAÇÕES DE PROGRESSO&gt;</span>
+                            <span class="section-chevron">▲</span>
+                        </div>
+                        <div class="section-content" id="progressInfo">
+                            <div class="section-text">CARREGANDO...</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Divisor -->
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção HABILIDADES -->
+                    <div class="attribute-section">
+                        <div class="section-header">
+                            <span class="section-header-text">&lt;HABILIDADES&gt;</span>
+                            <span class="section-chevron">▲</span>
+                        </div>
+                        <div class="section-content" id="skillsList">
+                            <div class="section-text">NENHUMA HABILIDADE CADASTRADA</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Divisor -->
+                    <div class="section-divider"></div>
+                    
+                    <!-- Seção RUNAS -->
+                    <div class="attribute-section">
+                        <div class="section-header">
+                            <span class="section-header-text">&lt;RUNAS&gt;</span>
+                            <span class="section-chevron">▲</span>
+                        </div>
+                        <div class="section-content" id="runesList">
+                            <div class="section-text">NENHUMA RUNA CADASTRADA</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção de Notificações -->
+                <div class="content-section" id="notificationSection">
+                    <!-- Partículas brancas pequenas no fundo -->
+                    <div class="star-particles" data-particles="notification"></div>
+                    
+                    <!-- Título principal -->
+                    <div class="attribute-window-title">NOTIFICATION</div>
+                    
+                    <!-- Padrão de fundo com circuitos eletrônicos -->
+                    <div class="notification-circuit-bg"></div>
+                    
+                    <!-- Container principal de notificações -->
+                    <div class="notification-container">
+                        <div class="notification-list">
+                            <!-- Notificação 1 -->
+                            <div class="notification-window">
+                                <div class="notification-content-section">
+                                    <div class="notification-title-section">
+                                        <div class="notification-title-text">NOTIFICATION</div>
+                                        <div class="notification-icon-frame">
+                                            <div class="notification-icon">!</div>
+                                        </div>
+                                    </div>
+                                    <div class="notification-message">Você completou a missão "Caçada de Goblin"</div>
+                                    <div class="notification-time">01:23</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Notificação 2 -->
+                            <div class="notification-window">
+                                <div class="notification-content-section">
+                                    <div class="notification-title-section">
+                                        <div class="notification-title-text">NOTIFICATION</div>
+                                        <div class="notification-icon-frame">
+                                            <div class="notification-icon">!</div>
+                                        </div>
+                                    </div>
+                                    <div class="notification-message">Novo título desbloqueado: "Caçador de Goblin"</div>
+                                    <div class="notification-time">02:45</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Notificação 3 -->
+                            <div class="notification-window">
+                                <div class="notification-content-section">
+                                    <div class="notification-title-section">
+                                        <div class="notification-title-text">NOTIFICATION</div>
+                                        <div class="notification-icon-frame">
+                                            <div class="notification-icon">!</div>
+                                        </div>
+                                    </div>
+                                    <div class="notification-message">Você subiu para o nível 81</div>
+                                    <div class="notification-time">03:12</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção de Trainne -->
+                <div class="content-section" id="trainneSection">
+                    <!-- Partículas brancas pequenas no fundo -->
+                    <div class="star-particles" data-particles="trainne"></div>
+                    
+                    <!-- Título principal -->
+                    <div class="attribute-window-title">TREINAMENTO</div>
+                    <div class="trainne-info">
+                        <div class="stat-item">
+                            <span class="label">PONTOS DE TREINAMENTO:</span>
+                            <span class="value">245</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="label">TREINOS COMPLETADOS:</span>
+                            <span class="value">12</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção de Tasks -->
+                <div class="content-section" id="tasksSection">
+                    <!-- Partículas brancas pequenas no fundo -->
+                    <div class="star-particles" data-particles="tasks"></div>
+                    
+                    <!-- Título principal -->
+                    <div class="attribute-window-title">TAREFAS</div>
+                    <div class="tasks-header">
+                        <div class="tasks-header-left">
+                            <button class="form-btn submit-btn" id="addHabitBtn">NOVO HÁBITO</button>
+                            <button class="form-btn submit-btn" id="addMissionBtn">NOVA MISSÃO</button>
+                            <button class="form-btn submit-btn" id="viewAllTasksBtn">VER TODOS</button>
+                        </div>
+                        <div class="tasks-header-right">
+                            <span class="tasks-hint">Cadastre hábitos e missões recorrentes para aparecerem automaticamente nos dias corretos.</span>
+                        </div>
+                    </div>
+                    <div class="tasks-columns">
+                        <div class="tasks-column">
+                            <div class="section-header">
+                                <span class="section-header-text">&lt;HÁBITOS DE HOJE&gt;</span>
+                            </div>
+                            <div class="task-list" id="tasksDailyList">
+                                <!-- Hábitos renderizados dinamicamente -->
+                            </div>
+                        </div>
+                        <div class="tasks-column">
+                            <div class="section-header">
+                                <span class="section-header-text">&lt;MISSÕES DE HOJE&gt;</span>
+                            </div>
+                            <div class="task-list" id="missionsList">
+                                <!-- Missões renderizadas dinamicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção de Penality -->
+                <div class="content-section" id="penalitySection">
+                    <!-- Partículas brancas pequenas no fundo -->
+                    <div class="star-particles" data-particles="penality"></div>
+                    
+                    <!-- Título principal -->
+                    <div class="attribute-window-title">PENALIDADES</div>
+                    <div class="penality-info">
+                        <div class="stat-item">
+                            <span class="label">PENALIDADES ATIVAS:</span>
+                            <span class="value">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção de Shop -->
+                <div class="content-section" id="shopSection">
+                    <!-- Partículas brancas pequenas no fundo -->
+                    <div class="star-particles" data-particles="shop"></div>
+                    
+                    <!-- Título principal -->
+                    <div class="attribute-window-title">LOJA</div>
+                    
+                    <!-- Cabeçalho da Loja -->
+                    <div class="shop-header">
+                        <!-- Abas da Loja -->
+                        <div class="shop-tabs">
+                            <button class="shop-tab-btn active" data-shop-tab="recompensas">RECOMPENSAS</button>
+                            <button class="shop-tab-btn" data-shop-tab="pocoes">POÇÕES</button>
+                            <button class="shop-tab-btn" data-shop-tab="inventario">INVENTÁRIO</button>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Itens -->
+                    <div class="shop-items-list" id="shopItemsList">
+                        <!-- Itens serão renderizados dinamicamente -->
+                    </div>
+
+                    <!-- Modal de Compra -->
+                    <div class="shop-modal hidden" id="shopModal">
+                        <div class="shop-modal-backdrop"></div>
+                        <div class="shop-modal-box">
+                            <div class="shop-modal-title">
+                                <span>Deseja comprar?</span>
+                                <div class="shop-modal-item-name" id="modalItemName">[Item]</div>
+                            </div>
+                            <div class="shop-modal-stage">
+                                <div class="shop-modal-icon-box">
+                                    <div class="shop-modal-icon" id="modalItemIcon">⚔</div>
+                                </div>
+                                <input type="number" id="modalQty" min="1" value="1" class="shop-modal-qty-input">
+                                <div class="shop-modal-price underlined" id="modalItemPrice">0 G</div>
+                            </div>
+                            <div class="shop-modal-actions">
+                                <button class="shop-modal-btn outline" id="modalCancel">CANCELAR</button>
+                                <button class="shop-modal-btn solid" id="modalBuy">COMPRAR</button>
+                            </div>
+                            <div class="shop-modal-balance">
+                                <span class="shop-coin-icon">G</span>
+                                <span id="modalBalance">3,102,629</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rodapé da Loja -->
+                    <div class="shop-footer">
+                        <div class="shop-currency shop-currency-right">
+                            <span class="shop-coin-icon">G</span>
+                            <span class="shop-currency-amount">3,102,629</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Abas - Separadas do window-content -->
+        <div class="tabs-container">
+            <button class="tab-icon-btn active" data-tab="status" title="STATUS">
+                <img src="images/status.png" alt="STATUS" class="tab-icon-img">
+            </button>
+            <button class="tab-icon-btn" data-tab="notification" title="NOTIFICATION">
+                <img src="images/notification.png" alt="NOTIFICATION" class="tab-icon-img">
+            </button>
+            <button class="tab-icon-btn" data-tab="trainne" title="TRAINNE">
+                <img src="images/trainne.png" alt="TRAINNE" class="tab-icon-img">
+            </button>
+            <button class="tab-icon-btn" data-tab="tasks" title="TASKS">
+                <img src="images/ability.png" alt="TASKS" class="tab-icon-img">
+            </button>
+            <button class="tab-icon-btn" data-tab="penality" title="PENALITY">
+                <img src="images/penality.png" alt="PENALITY" class="tab-icon-img">
+            </button>
+            <button class="tab-icon-btn" data-tab="shop" title="SHOP">
+                <img src="images/buy.png" alt="SHOP" class="tab-icon-img">
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Configuração Inicial -->
+    <div class="settings-modal" id="initialConfigModal">
+        <div class="settings-backdrop"></div>
+        <div class="settings-box">
+            <div class="settings-header">
+                <h3 class="settings-title">CONFIGURAÇÃO INICIAL</h3>
+            </div>
+            <div class="settings-content">
+                <form id="initialConfigForm" class="item-form">
+                    <div class="form-group">
+                        <label class="form-label">Nome:</label>
+                        <input type="text" id="initialName" class="form-input" placeholder="Digite seu nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Apelido:</label>
+                        <input type="text" id="initialApelido" class="form-input" placeholder="Digite seu apelido" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="form-btn submit-btn">INICIAR</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Seleção de Classe -->
+    <div class="settings-modal hidden" id="classSelectionModal">
+        <div class="settings-backdrop"></div>
+        <div class="settings-box" style="max-width: 900px;">
+            <div class="settings-header">
+                <h3 class="settings-title">SELECIONE SUA CLASSE</h3>
+                <button class="settings-close" id="classSelectionClose">×</button>
+            </div>
+            <div class="settings-content">
+                <div class="classes-grid" id="classesGrid">
+                    <!-- Classes serão renderizadas dinamicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Configurações (Cadastro de Itens) -->
+    <div class="settings-modal hidden" id="settingsModal">
+        <div class="settings-backdrop"></div>
+        <div class="settings-box">
+            <div class="settings-header">
+                <h3 class="settings-title">CADASTRAR ITEM NA LOJA</h3>
+                <button class="settings-close" id="settingsClose">×</button>
+            </div>
+            <div class="settings-content">
+                <form id="itemForm" class="item-form">
+                    <div class="form-group">
+                        <label class="form-label">Ícone do Item (Imagem/GIF):</label>
+                        <div class="icon-preview-container">
+                            <input type="file" id="itemIcon" class="form-file-input" accept="image/*" required>
+                            <div class="icon-preview" id="iconPreview">
+                                <span class="preview-placeholder">Preview do ícone</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nome do Item:</label>
+                        <input type="text" id="itemName" class="form-input" placeholder="Ex: ESPADA LEGENDÁRIA" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Valor (G):</label>
+                        <input type="number" id="itemPrice" class="form-input" placeholder="Ex: 100000" min="0" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="form-btn cancel-btn" id="cancelItemBtn">CANCELAR</button>
+                        <button type="submit" class="form-btn submit-btn">CADASTRAR</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="System_script.js"></script>
+</body>
+</html>
+
