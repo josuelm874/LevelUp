@@ -1,5 +1,5 @@
 // Cache offline: app shell (cache-first, versão) + fontes Google (stale-while-revalidate).
-const V = 'sys-v1';
+const V = 'sys-v2';
 const SHELL = ['System.html', 'System_script.js', 'System_style.css', 'System_sync.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {

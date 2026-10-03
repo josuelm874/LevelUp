@@ -147,7 +147,7 @@
     function setStatus(t) { if (statusEl) statusEl.textContent = t; }
 
     function buildUI() {
-        const host = document.getElementById('configuracoesSection');
+        const host = document.querySelector('#configuracoesSection .cfg-sections') || document.getElementById('configuracoesSection'); // .cfg-sections é a área rolável
         if (!host || document.getElementById('sysSyncCard')) return;
         const c = cfg();
         const card = document.createElement('div');

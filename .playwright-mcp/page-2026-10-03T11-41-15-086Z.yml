@@ -1,0 +1,132 @@
+- generic [active] [ref=f5e1]:
+  - dialog "Identidade" [ref=f5e3]:
+    - generic [ref=f5e5]: IDENTIDADE
+    - generic [ref=f5e6]: REGISTRO NO SISTEMA
+    - textbox "Nome ou apelido de caçador" [ref=f5e8]:
+      - /placeholder: ""
+    - button "INICIAR" [ref=f5e9] [cursor=pointer]: INICIAR ›
+  - complementary [ref=f5e10]:
+    - generic [ref=f5e18]:
+      - generic [ref=f5e19]: O SISTEMA
+      - generic [ref=f5e20]: ARQUITETURA DA EVOLUÇÃO
+    - generic [ref=f5e21]:
+      - generic [ref=f5e22]: HUNTER
+      - generic [ref=f5e23]: NÍVEL 0 — O Despertar
+      - generic [ref=f5e24]:
+        - generic [ref=f5e25]: E
+        - generic [ref=f5e26]: G 0
+      - generic [ref=f5e27]: 0/100 XP
+    - navigation [ref=f5e28]:
+      - button "PAINEL" [ref=f5e29] [cursor=pointer]
+      - button "CALENDÁRIO" [ref=f5e37] [cursor=pointer]
+      - button "MISSÕES" [ref=f5e44] [cursor=pointer]
+      - button "ARENA" [ref=f5e51] [cursor=pointer]
+      - button "LOJA DO TEMPO" [ref=f5e56] [cursor=pointer]
+      - button "ITENS DE RECOMPENSA" [ref=f5e62] [cursor=pointer]
+      - button "MATRIZ DE PRIORIDADES" [ref=f5e69] [cursor=pointer]
+      - button "PROGRESSO" [ref=f5e77] [cursor=pointer]
+      - button "VIRTUDES" [ref=f5e83] [cursor=pointer]
+      - button "ARQUITETO IA" [ref=f5e90] [cursor=pointer]
+      - button "ÁRVORE DE EVOLUÇÃO" [ref=f5e96] [cursor=pointer]
+      - button "ARQUITETO" [ref=f5e104] [cursor=pointer]
+      - button "NOTIFICAÇÕES" [ref=f5e111] [cursor=pointer]
+      - button "TREINO" [ref=f5e117] [cursor=pointer]
+      - button "ZONA DE FALHA" [ref=f5e124] [cursor=pointer]
+      - button "CONFIGURAÇÕES" [ref=f5e131] [cursor=pointer]
+    - generic [ref=f5e137]:
+      - generic [ref=f5e138]:
+        - generic [ref=f5e139]: MENSAGEM DO ARQUITETO IA
+        - paragraph [ref=f5e140]: A perfeição não é destino, é jornada constante.
+      - button "CONFIGURAÇÕES" [ref=f5e141] [cursor=pointer]
+      - button "SAIR" [ref=f5e145] [cursor=pointer]
+  - main [ref=f5e149]:
+    - generic [ref=f5e151]:
+      - generic [ref=f5e152]:
+        - button "Importar foto de perfil" [ref=f5e153] [cursor=pointer]
+        - heading "—" [level=2] [ref=f5e160]
+        - generic [ref=f5e161]:
+          - generic "Nível e condição" [ref=f5e162]: • NÍVEL 0 — O Despertar •
+          - paragraph [ref=f5e164]:
+            - text: RANK
+            - generic [ref=f5e165]: E
+      - generic [ref=f5e166]:
+        - generic [ref=f5e173]:
+          - generic [ref=f5e174]: TÍTULO ATIVO
+          - generic [ref=f5e175]: —
+        - generic [ref=f5e184]:
+          - generic [ref=f5e185]: COMPLETAS HOJE
+          - generic [ref=f5e186]: "0"
+        - generic [ref=f5e192]:
+          - generic [ref=f5e193]: XP DE HOJE
+          - generic [ref=f5e194]: "0"
+      - generic [ref=f5e195]:
+        - generic [ref=f5e197]:
+          - generic [ref=f5e198]:
+            - generic [ref=f5e203]:
+              - generic [ref=f5e204]: "#74"
+              - generic [ref=f5e205]: Ranking global · 74 de 74 hunters
+            - generic [ref=f5e206]:
+              - generic [ref=f5e207]: Pontuação
+              - generic [ref=f5e208]: "0"
+          - button "Abrir Arena global. Posição 74 de 74 hunters. Pontuação 0." [ref=f5e209] [cursor=pointer]: Ver classificação de Hunters
+        - generic [ref=f5e211]:
+          - paragraph [ref=f5e212]: NÍVEL 0 — O Despertar
+          - generic [ref=f5e213]:
+            - generic [ref=f5e214]:
+              - generic [ref=f5e215]: EXP
+              - generic [ref=f5e217]: 0/100
+            - generic [ref=f5e218]:
+              - generic [ref=f5e219]: HP
+              - generic [ref=f5e222]: 1000/1000
+            - generic [ref=f5e223]:
+              - generic [ref=f5e224]: MP
+              - generic [ref=f5e227]: 500/500
+        - generic [ref=f5e230]:
+          - generic [ref=f5e232]:
+            - img [ref=f5e234]:
+              - generic [ref=f5e238]: G
+            - generic [ref=f5e239]:
+              - generic [ref=f5e240]: COINS
+              - generic [ref=f5e241]: "0"
+          - generic [ref=f5e244]:
+            - generic [ref=f5e245]: RANK
+            - generic [ref=f5e246]: E
+      - generic [ref=f5e251]:
+        - paragraph [ref=f5e252]: SEU STATUS
+        - generic [ref=f5e253]:
+          - generic [ref=f5e254]:
+            - generic [ref=f5e260]: "0"
+            - generic [ref=f5e261]: FORÇA
+          - generic [ref=f5e262]:
+            - generic [ref=f5e266]: "0"
+            - generic [ref=f5e267]: VITALIDADE
+          - generic [ref=f5e268]:
+            - generic [ref=f5e276]: "0"
+            - generic [ref=f5e277]: FOCO
+          - generic [ref=f5e278]:
+            - generic [ref=f5e282]: "0"
+            - generic [ref=f5e283]: CARISMA
+          - generic [ref=f5e284]:
+            - generic [ref=f5e288]: "0"
+            - generic [ref=f5e289]: DISCIPLINA
+          - generic [ref=f5e290]:
+            - generic [ref=f5e294]: "0"
+            - generic [ref=f5e295]: SABEDORIA
+      - generic [ref=f5e297] [cursor=pointer]:
+        - generic [ref=f5e298]: TÍTULO
+        - generic [ref=f5e299]: ▲
+      - generic [ref=f5e301] [cursor=pointer]:
+        - generic [ref=f5e302]: INFORMAÇÕES DE PROGRESSO
+        - generic [ref=f5e303]: ▲
+      - generic [ref=f5e305] [cursor=pointer]:
+        - generic [ref=f5e306]: HABILIDADES
+        - generic [ref=f5e307]: ▲
+      - generic [ref=f5e309] [cursor=pointer]:
+        - generic [ref=f5e310]: RUNAS
+        - generic [ref=f5e311]: ▲
+      - region "Mensagem do Arquiteto IA" [ref=f5e312]:
+        - generic [ref=f5e318]:
+          - heading "O ARQUITETO IA" [level=2] [ref=f5e319]
+          - paragraph [ref=f5e320]: Observa a tua forma
+        - paragraph [ref=f5e321]: Um guerreiro fraco que treina todos os dias supera um forte que descansa.
+      - button "Abrir missões" [ref=f5e322] [cursor=pointer]: +

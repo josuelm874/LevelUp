@@ -11404,3 +11404,7 @@ body.sys-app { padding-bottom: env(safe-area-inset-bottom, 0px); padding-top: en
 .sys-sync-row { display: flex; flex-wrap: wrap; gap: .5rem; }
 .sys-sync-row button, .sys-sync-btn { padding: .6rem 1rem; border-radius: 8px; border: 1px solid rgba(0,229,255,.4); background: rgba(0,229,255,.1); color: #5eead4; cursor: pointer; display: inline-flex; align-items: center; }
 .sys-sync-status { font-size: .85rem; opacity: .8; }
+
+/* Configurações: a seção inteira rola (antes: overflow hidden cortava o conteúdo no desktop) */
+#configuracoesSection { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+#configuracoesSection .cfg-sections { overflow: visible; flex: none; }
