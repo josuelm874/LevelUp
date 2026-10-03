@@ -1,0 +1,7 @@
+{
+  "appId": "com.systemlevelup.app",
+  "appName": "System Level Up",
+  "webDir": "www",
+  "server": { "androidScheme": "https" },
+  "android": { "backgroundColor": "#05070d" }
+}

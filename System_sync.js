@@ -8,7 +8,9 @@
     const LAST_KEY = 'sysSyncLastTs';  // updated_at remoto da última sincronização
     const BACKUP_KEYS = [DATA_KEY, 'lastPenaltyCheckDate', 'penaltySystemInitialized'];
     const rd = k => { try { return localStorage.getItem(k); } catch (_) { return null; } };
-    const cfg = () => { try { return JSON.parse(rd(CFG_KEY)) || {}; } catch (_) { return {}; } };
+    // Projeto Supabase dedicado (chave publishable é pública por design; a segurança é a RLS da tabela saves).
+    const DEFAULTS = { url: 'https://kavahwegsdnesxzddhen.supabase.co', anon: 'sb_publishable_E47Drkv9tT5IONl0Zdy6Sg_z14a80OO' };
+    const cfg = () => { try { return Object.assign({}, DEFAULTS, JSON.parse(rd(CFG_KEY)) || {}); } catch (_) { return Object.assign({}, DEFAULTS); } };
     const saveCfg = c => localStorage.setItem(CFG_KEY, JSON.stringify(c));
     const toast = (m, t) => (typeof showToast === 'function' ? showToast(m, t || 'info') : console.log(m));
 

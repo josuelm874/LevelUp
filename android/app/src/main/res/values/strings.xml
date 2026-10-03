@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">System Level Up</string>
+    <string name="title_activity_main">System Level Up</string>
+    <string name="package_name">com.systemlevelup.app</string>
+    <string name="custom_url_scheme">com.systemlevelup.app</string>
+</resources>
