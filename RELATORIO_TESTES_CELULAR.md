@@ -82,3 +82,10 @@ Método: app dirigido via Chrome DevTools Protocol (WebView) + toques/teclado re
 Corrigidos e revalidados (navegador + celular): F25 (X-Title), F15/F14 (treino: botões e lista), F45/F12 (datas locais), F3/F9 (XSS: escape nos renders), F35 (efeito das runas), F36 (valor de atributo), F2 (barra de progresso), F21 (compra na loja), F28 (botão Configurações), F37/F38 (classe nível 50), F41 (botão Voltar), F11 (nomes de hábitos), F1 (tag Única).
 Corrigido no sync: falso conflito a cada abertura (hash canônico do conteúdo).
 Pendentes: F34 (inventário), F47/F10 (hábitos/estudos sem UI), F39 (bônus de classe), F40 (memória), F50 (Árvore), demais baixos.
+
+## Rodada 2 (melhorias)
+- F34: Inventário na aba Loja com botão USAR (poções/recompensas); Escudo 24H bloqueia penalidades automáticas por 24 h.
+- F19: Histórico de Compras funcional.
+- F8/F10: penalidade automática agora também avalia missões recorrentes não únicas (liga/desliga em Configurações > Regras).
+- F39 retirado: bônus de classe é recompensa semanal de moedas (já existe); F50 retirado: área vazia é o tronco da Árvore sem atributo selecionado.
+- Pendentes: F47 (Estudos sem UI), F40 (memória), baixos restantes.

@@ -11408,3 +11408,12 @@ body.sys-app { padding-bottom: env(safe-area-inset-bottom, 0px); padding-top: en
 /* Configurações: a seção inteira rola (antes: overflow hidden cortava o conteúdo no desktop) */
 #configuracoesSection { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
 #configuracoesSection .cfg-sections { overflow: visible; flex: none; }
+
+/* Inventário e histórico (System_extras.js) */
+.vsi { margin: 1.2rem 0; padding: 1rem; border: 1px solid rgba(0,229,255,.25); border-radius: 12px; background: rgba(5,7,13,.6); display: flex; flex-direction: column; gap: .5rem; }
+.vsi-title { margin: 0; font-family: Orbitron, sans-serif; color: #5eead4; font-size: 1rem; }
+.vsi-row { display: flex; align-items: center; gap: .6rem; padding: .4rem 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+.vsi-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.vsi-time { font-size: .75rem; opacity: .6; }
+.vsi-use { padding: .5rem .9rem; border-radius: 8px; border: 1px solid rgba(0,229,255,.4); background: rgba(0,229,255,.1); color: #5eead4; cursor: pointer; }
+.vsi-empty, .vsi-shield { opacity: .75; font-size: .9rem; }

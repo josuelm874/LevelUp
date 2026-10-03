@@ -708,7 +708,9 @@ class GameSystem {
 
                 // Habilidades propostas pela IA, aguardando aprovação do usuário
                 habilidadesPropostas: data.habilidadesPropostas || [],
-                lastSkillAnalysisDate: data.lastSkillAnalysisDate || ''
+                lastSkillAnalysisDate: data.lastSkillAnalysisDate || '',
+                escudoAte: data.escudoAte || 0,
+                penalizarMissoes: data.penalizarMissoes !== false
             };
         } else {
             this.loadDefaultData();
@@ -780,7 +782,9 @@ class GameSystem {
             runasCatalogoAtivas: [],
             desafiosArquiteto: [],
             habilidadesPropostas: [],
-            lastSkillAnalysisDate: ''
+            lastSkillAnalysisDate: '',
+            escudoAte: 0,
+            penalizarMissoes: true
         };
     }
 
