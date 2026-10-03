@@ -26,7 +26,7 @@
     };
 
     // --- PWA ---
-    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    if ('serviceWorker' in navigator && location.protocol !== 'file:' && !window.Capacitor) { // APK já serve tudo local
         navigator.serviceWorker.register('sw.js').catch(e => console.warn('SW falhou', e));
     }
     if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
