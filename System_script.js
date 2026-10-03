@@ -954,7 +954,7 @@ class GameSystem {
     // ============================================
 
     ensureXpHoje() {
-        const d = new Date().toISOString().slice(0, 10);
+        const d = localDateKey(new Date());
         if (this.data.lastXpDay !== d) {
             this.data.xpHoje = 0;
             this.data.lastXpDay = d;
@@ -2951,14 +2951,18 @@ class GameSystem {
 // ============================================
 
 // Normaliza data para chave YYYY-MM-DD
+// Data LOCAL (não UTC): evita virar o dia às 21h no fuso do Brasil.
+function localDateKey(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
 function getTodayKey() {
-    const d = new Date();
-    return d.toISOString().slice(0, 10);
+    return localDateKey(new Date());
 }
 
 function getDateKey(date) {
     if (typeof date === 'string') return date.slice(0, 10);
-    return date.toISOString().slice(0, 10);
+    return localDateKey(date);
 }
 
 // Verifica se uma tarefa recorrente deve aparecer hoje
@@ -9241,7 +9245,7 @@ function buildArquitetoSystemPrompt() {
     const treinos = (d.treinosSemana || []).filter(t => new Date(t.data) >= startOfWeek).length;
 
     // Schema atual: missão "pendente" = sem completion para hoje (e não única já feita).
-    const todayKey = new Date().toISOString().slice(0, 10);
+    const todayKey = localDateKey(new Date());
     const missoesPendentes = (d.missoes || []).filter(m => {
         const completions = Array.isArray(m.completions) ? m.completions : [];
         const isUnique = m.recurrence === 'unique' || m.recorrencia === 'unique';
@@ -10967,7 +10971,7 @@ function drawActivityChart() {
     for (let i = 6; i >= 0; i--) {
         const d = new Date(today);
         d.setDate(today.getDate() - i);
-        days.push(d.toISOString().slice(0, 10));
+        days.push(localDateKey(d));
     }
 
     // Schema atual: task.completions[] guarda chaves YYYY-MM-DD; XP vem de task.rewards.exp.
