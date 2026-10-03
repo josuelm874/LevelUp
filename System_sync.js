@@ -6,6 +6,7 @@
     const CFG_KEY = 'sysSyncCfg';      // {url, anon, email, access, refresh, exp}
     const TS_KEY = 'sysSyncLocalTs';   // quando o dado local mudou
     const LAST_KEY = 'sysSyncLastTs';  // updated_at remoto da última sincronização
+    const HASH_KEY = 'sysSyncDataHash'; // hash canônico do último dado sincronizado
     const BACKUP_KEYS = [DATA_KEY, 'lastPenaltyCheckDate', 'penaltySystemInitialized'];
     const rd = k => { try { return localStorage.getItem(k); } catch (_) { return null; } };
     // Projeto Supabase dedicado (chave publishable é pública por design; a segurança é a RLS da tabela saves).
@@ -14,12 +15,22 @@
     const saveCfg = c => localStorage.setItem(CFG_KEY, JSON.stringify(c));
     const toast = (m, t) => (typeof showToast === 'function' ? showToast(m, t || 'info') : console.log(m));
 
+    // Hash independente da ordem das chaves (jsonb do Postgres reordena): só mudança REAL de conteúdo conta.
+    const canon = v => Array.isArray(v) ? '[' + v.map(canon).join(',') + ']'
+        : v && typeof v === 'object' ? '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + canon(v[k])).join(',') + '}'
+        : JSON.stringify(v);
+    const dataHash = raw => {
+        let t; try { t = canon(JSON.parse(raw)); } catch (_) { t = String(raw); }
+        let h = 5381; for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) | 0;
+        return String(h);
+    };
+
     // --- marca quando o dado local muda (usa o setItem original para não recursar) ---
     let applying = false;
     const origSet = Storage.prototype.setItem;
     Storage.prototype.setItem = function (k, v) {
         origSet.call(this, k, v);
-        if (this === localStorage && k === DATA_KEY && !applying) {
+        if (this === localStorage && k === DATA_KEY && !applying && dataHash(v) !== rd(HASH_KEY)) {
             origSet.call(this, TS_KEY, new Date().toISOString());
             schedulePush();
         }
@@ -108,6 +119,7 @@
             body: JSON.stringify({ user_id: c.uid, data: JSON.parse(raw), updated_at: ts })
         }, true);
         origSet.call(localStorage, LAST_KEY, ts);
+        origSet.call(localStorage, HASH_KEY, dataHash(raw));
     }
 
     let pushTimer = null;
@@ -124,7 +136,9 @@
         const localTs = rd(TS_KEY), last = rd(LAST_KEY);
         if (!remote) { await push(); return setStatus('Primeiro envio feito.'); }
         const remoteNew = !last || remote.updated_at > last;
-        const localNew = localTs && (!last || localTs > last);
+        // sem mudança real de conteúdo desde a última sync, não há "alteração local"
+        const sameAsSynced = rd(HASH_KEY) && dataHash(rd(DATA_KEY) || '{}') === rd(HASH_KEY);
+        const localNew = !sameAsSynced && localTs && (!last || localTs > last);
         if (remoteNew && !localNew) return applyRemote(remote);
         if (remoteNew && localNew) {
             if (confirm('Há alterações neste aparelho E na nuvem.\nOK = usar a NUVEM (perde as locais)\nCancelar = enviar ESTE aparelho (sobrescreve a nuvem)')) return applyRemote(remote);
@@ -137,6 +151,7 @@
     function applyRemote(remote) {
         applying = true;
         origSet.call(localStorage, DATA_KEY, JSON.stringify(remote.data));
+        origSet.call(localStorage, HASH_KEY, dataHash(JSON.stringify(remote.data)));
         origSet.call(localStorage, LAST_KEY, remote.updated_at);
         origSet.call(localStorage, TS_KEY, remote.updated_at);
         location.reload();

@@ -1,6 +1,0 @@
-[     394ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:8765/System.html:0
-[     394ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:8765/System.html:0
-[     394ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:8765/System.html:0
-[     414ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://mock.supabase.co/rest/v1/saves?select=data,updated_at:0
-[     414ms] [WARNING] sync: Failed to fetch @ http://localhost:8765/System_sync.js:187
-[    5345ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://mock.supabase.co/rest/v1/saves?on_conflict=user_id:0

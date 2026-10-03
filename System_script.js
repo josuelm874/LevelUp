@@ -852,7 +852,7 @@ class GameSystem {
             if (typeof updateArenaPainelCard === 'function') {
                 updateArenaPainelCard(this);
             }
-            return;
+            // sem return: MP, penalidades, títulos etc. precisam rodar mesmo com a classe pendente
         }
 
         // Inicializar recuperação de MP
@@ -1003,6 +1003,10 @@ class GameSystem {
         
         // Calcular EXP necessária para próximo nível (20% a mais)
         this.data.expNecessaria = Math.floor(this.data.expNecessaria * 1.2);
+        // Nível 50 alcançado durante o uso: abre a escolha de classe na hora (antes só ao reabrir o app)
+        if (this.data.nivel >= 50 && !this.data.classeSelecionada && !this.data.classe) {
+            setTimeout(() => this.showClassSelection(), 800);
+        }
         
         // Atualizar HP e MP (20% a mais)
         this.data.hpMax = Math.floor(this.data.hpMax * 1.2);
@@ -1459,7 +1463,7 @@ class GameSystem {
         let startDate;
         if (lastCheckStr) {
             // Começa no dia seguinte ao último dia verificado
-            startDate = new Date(lastCheckStr);
+            startDate = parseLocalDate(lastCheckStr);
             startDate.setHours(0, 0, 0, 0);
             startDate = new Date(startDate.getTime() + 86400000);
         } else {
@@ -1491,7 +1495,7 @@ class GameSystem {
         });
 
         if (incompleteHabits.length > 0) {
-            this.applyPenaltyForDate(dateKey, incompleteHabits.map(h => h.nome));
+            this.applyPenaltyForDate(dateKey, incompleteHabits.map(h => h.titulo || h.nome));
         }
     }
 
@@ -1629,10 +1633,10 @@ class GameSystem {
                 </div>
                 <div style="flex: 1;">
                     <div style="font-size: 16px; font-weight: bold; color: #ffffff; margin-bottom: 5px;">
-                        ${notification.title}
+                        ${_escapeHtml(notification.title)}
                     </div>
                     <div style="font-size: 13px; color: rgba(255, 255, 255, 0.8);">
-                        ${notification.message}
+                        ${_escapeHtml(notification.message)}
                     </div>
                 </div>
                 <button class="notification-popup-close" style="background: none; border: none; color: rgba(255,255,255,0.6); font-size: 20px; cursor: pointer; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">×</button>
@@ -2020,11 +2024,11 @@ class GameSystem {
                     return `<div class="notif-card" style="border-color:${tc.border};background:${tc.bg}">
                         <div class="notif-card-header">
                             <div class="notif-dot" style="background:${tc.color};box-shadow:0 0 6px ${tc.color}"></div>
-                            <div class="notif-title">${notif.title}</div>
+                            <div class="notif-title">${_escapeHtml(notif.title)}</div>
                             <div class="notif-icon" style="color:${tc.color}">${this.getNotificationIcon(notif.type)}</div>
                             <button class="notif-del-btn" onclick="deleteNotification(${notif.id})">×</button>
                         </div>
-                        <div class="notif-message">${notif.message}</div>
+                        <div class="notif-message">${_escapeHtml(notif.message)}</div>
                         <div class="notif-time">${notif.time}</div>
                     </div>`;
                 }).join('') : '<div class="notif-empty">Nenhuma notificação encontrada.</div>'}
@@ -2268,9 +2272,9 @@ class GameSystem {
             const isManual = p.isManual;
 
             const habitsInfo = p.incompleteHabits?.length
-                ? `<div class="zf-item-detail">Hábitos: ${p.incompleteHabits.join(', ')}</div>` : '';
+                ? `<div class="zf-item-detail">Hábitos: ${_escapeHtml(p.incompleteHabits.join(', '))}</div>` : '';
             const reasonInfo = p.reason
-                ? `<div class="zf-item-detail">Motivo: ${p.reason}</div>` : '';
+                ? `<div class="zf-item-detail">Motivo: ${_escapeHtml(p.reason)}</div>` : '';
 
             return `<div class="zf-item ${isManual ? 'zf-item--manual' : 'zf-item--auto'}">
                 <div class="zf-item-header">
@@ -2278,7 +2282,7 @@ class GameSystem {
                     <span class="zf-item-badge zf-item-badge--${isManual ? 'manual' : 'auto'}">${typeLabel}</span>
                     <span class="zf-item-hp">HP -${p.hpLoss}</span>
                 </div>
-                <div class="zf-item-desc">${p.description || '—'}</div>
+                <div class="zf-item-desc">${_escapeHtml(p.description || '—')}</div>
                 ${habitsInfo}${reasonInfo}
             </div>`;
         }).join('');
@@ -2956,6 +2960,12 @@ function localDateKey(d) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
+// 'YYYY-MM-DD' -> Date local à meia-noite (new Date('YYYY-MM-DD') é UTC e recua 1 dia no Brasil).
+function parseLocalDate(v) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(v || ''));
+    return m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(v);
+}
+
 function getTodayKey() {
     return localDateKey(new Date());
 }
@@ -2982,7 +2992,7 @@ function shouldTaskAppearToday(task, today = new Date()) {
     // Demais casos: recorrentes
     if (!task.recurrence) return false;
 
-    const start = new Date(task.recurrence.startDate || getTodayKey());
+    const start = parseLocalDate(task.recurrence.startDate || getTodayKey());
     const todayCopy = new Date(today.getTime());
     const startCopy = new Date(start.getTime());
 
@@ -3074,6 +3084,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Navegação de abas + gaveta da sidebar (mobile)
     initTabNavigation();
     initMobileSidebar();
+
+    const settingsBtn = document.getElementById('settingsBtn');
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', function() {
+            const tab = document.querySelector('.sys-nav .tab-icon-btn[data-tab="configuracoes"], .sys-nav-item[data-tab="configuracoes"]');
+            if (tab) tab.click();
+        });
+    }
 
     const sairBtn = document.getElementById('sairBtn');
     if (sairBtn) {
@@ -3718,12 +3736,15 @@ function initTabNavigation() {
                     // Atualizar habilidades em TRAINNE se for a seção de treinamento
                     if (targetTab === 'trainne' && gameSystem) {
                         setTimeout(() => {
-                            if (typeof renderSkillsInTraining === 'function') {
-                                renderSkillsInTraining();
-                            }
+                            // Lista de treinos primeiro: erro em habilidades não pode impedir a renderização
                             if (typeof renderTreinoVideo === 'function') {
                                 renderTreinoVideo();
                             }
+                            try {
+                                if (typeof renderSkillsInTraining === 'function') {
+                                    renderSkillsInTraining();
+                                }
+                            } catch (e) { console.warn('renderSkillsInTraining falhou', e); }
                         }, 200);
                     }
 
@@ -4176,6 +4197,7 @@ function saveTraining(previewData, existingTraining = null) {
     
     gameSystem.saveData();
     renderTrainings();
+    if (typeof renderTreinoVideo === 'function') renderTreinoVideo();
     if (typeof renderProgressCharts === 'function') {
         setTimeout(() => renderProgressCharts(), 100);
     }
@@ -4356,7 +4378,7 @@ function renderTrainings() {
                     <div class="training-info-grid">
                         <div class="training-info-item">
                             <span class="training-info-label">NOME:</span>
-                            <span class="training-info-value">${treino.nome}</span>
+                            <span class="training-info-value">${_escapeHtml(treino.nome)}</span>
                         </div>
                         <div class="training-info-item">
                             <span class="training-info-label">SÉRIES:</span>
@@ -4528,40 +4550,40 @@ function buildTrainingCardHtmlVideo(treino) {
     const title = (treino.nome || treino.exerciseName || 'Treino').toString();
     const done = !!treino.concluido;
 
-    const seriesTag = treino.series != null ? `<span class=”vid-tag vid-tag--meta”>${treino.series}x</span>` : '';
-    const repsTag = treino.repeticoes != null ? `<span class=”vid-tag vid-tag--meta”>${treino.repeticoes} reps</span>` : '';
-    const cargaTag = treino.carga > 0 ? `<span class=”vid-tag vid-tag--meta”>${treino.carga}kg</span>` : '';
-    const descansoTag = treino.descanso > 0 ? `<span class=”vid-tag vid-tag--meta”>⏱${treino.descanso}s</span>` : '';
-    const doneTag = done ? `<span class=”vid-tag vid-tag--done”>CONCLUÍDO</span>` : '';
+    const seriesTag = treino.series != null ? `<span class="vid-tag vid-tag--meta">${treino.series}x</span>` : '';
+    const repsTag = treino.repeticoes != null ? `<span class="vid-tag vid-tag--meta">${treino.repeticoes} reps</span>` : '';
+    const cargaTag = treino.carga > 0 ? `<span class="vid-tag vid-tag--meta">${treino.carga}kg</span>` : '';
+    const descansoTag = treino.descanso > 0 ? `<span class="vid-tag vid-tag--meta">⏱${treino.descanso}s</span>` : '';
+    const doneTag = done ? `<span class="vid-tag vid-tag--done">CONCLUÍDO</span>` : '';
 
     return `
-        <div class=”vid-mission-card${done ? ' vid-train-done' : ''}” data-train-id=”${id}”>
-            <div class=”vid-mission-toprow”>
-                <div class=”vid-mission-title”>${_escapeHtml(title)}</div>
-                <div class=”vid-mission-actions”>
-                    <button type=”button” class=”vid-mission-iconbtn js-train-edit” title=”Editar” aria-label=”Editar”>
-                        <svg viewBox=”0 0 16 16” fill=”none” stroke=”currentColor” stroke-width=”1.5” stroke-linecap=”round” stroke-linejoin=”round” style=”width:14px;height:14px”><path d=”M11 2l3 3-9 9H2v-3L11 2z”/></svg>
+        <div class="vid-mission-card${done ? ' vid-train-done' : ''}" data-train-id="${id}">
+            <div class="vid-mission-toprow">
+                <div class="vid-mission-title">${_escapeHtml(title)}</div>
+                <div class="vid-mission-actions">
+                    <button type="button" class="vid-mission-iconbtn js-train-edit" title="Editar" aria-label="Editar">
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg>
                     </button>
-                    <button type=”button” class=”vid-mission-iconbtn vid-mission-iconbtn--danger js-train-del” title=”Excluir” aria-label=”Excluir”>
-                        <svg viewBox=”0 0 16 16” fill=”none” stroke=”currentColor” stroke-width=”1.5” stroke-linecap=”round” stroke-linejoin=”round” style=”width:14px;height:14px”><path d=”M3 5h10M6 5V3h4v2M5 5l1 8h4l1-8”/></svg>
+                    <button type="button" class="vid-mission-iconbtn vid-mission-iconbtn--danger js-train-del" title="Excluir" aria-label="Excluir">
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M3 5h10M6 5V3h4v2M5 5l1 8h4l1-8"/></svg>
                     </button>
                 </div>
             </div>
-            <div class=”vid-mission-tags”>
+            <div class="vid-mission-tags">
                 ${seriesTag}${repsTag}${cargaTag}${descansoTag}
                 ${doneTag}
-                <span class=”vid-rew”>+50 XP | +Força</span>
+                <span class="vid-rew">+50 XP | +Força</span>
             </div>
-            <div class=”vid-mission-footer”>
-                <button type=”button” class=”vid-mission-complete js-train-complete” ${done ? 'disabled' : ''}>
-                    <span style=”display:inline-flex;align-items:center;gap:0.45rem;justify-content:center;”>
-                        <svg viewBox=”0 0 20 20” fill=”none” stroke=”currentColor” stroke-width=”2” stroke-linecap=”round” style=”width:14px;height:14px;opacity:0.85”>
-                            <path d=”M4 10l3.2 3.2L16 4.8”/>
+            <div class="vid-mission-footer">
+                <button type="button" class="vid-mission-complete js-train-complete" ${done ? 'disabled' : ''}>
+                    <span style="display:inline-flex;align-items:center;gap:0.45rem;justify-content:center;">
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px;opacity:0.85">
+                            <path d="M4 10l3.2 3.2L16 4.8"/>
                         </svg>
                         Completar
                     </span>
                 </button>
-                <button type=”button” class=”vid-mission-mini js-train-edit” aria-label=”Editar”>✎</button>
+                <button type="button" class="vid-mission-mini js-train-edit" aria-label="Editar">✎</button>
             </div>
         </div>
     `;
@@ -4722,7 +4744,7 @@ function renderGruposTreino() {
         const exerciciosHtml = (grupo.exercicios || []).map(ex => `
             <div class="exercicio-row">
                 <div class="exercicio-info">
-                    <span class="exercicio-nome">${ex.nome}</span>
+                    <span class="exercicio-nome">${_escapeHtml(ex.nome)}</span>
                     <span class="exercicio-detalhes">${ex.series}×${ex.repeticoes} · ${ex.descanso}s descanso · ${ex.cargaAtual}kg</span>
                 </div>
                 <div class="exercicio-actions">
@@ -4737,7 +4759,7 @@ function renderGruposTreino() {
             <div class="grupo-card">
                 <div class="grupo-header">
                     <div>
-                        <div class="grupo-nome">${grupo.nome}</div>
+                        <div class="grupo-nome">${_escapeHtml(grupo.nome)}</div>
                         <div class="grupo-dias">${diasStr}</div>
                     </div>
                     <div class="grupo-actions">
@@ -4950,7 +4972,7 @@ function showCargaSlider(grupoId, exercicioId) {
         <div class="settings-backdrop"></div>
         <div class="settings-box" style="max-width:420px">
             <div class="settings-header">
-                <h3 class="settings-title">LOAD LEVEL UP — ${ex.nome}</h3>
+                <h3 class="settings-title">LOAD LEVEL UP — ${_escapeHtml(ex.nome)}</h3>
                 <button class="settings-close" id="sliderModalClose">×</button>
             </div>
             <div class="settings-content">
@@ -5222,7 +5244,7 @@ function renderRelatorioProgressao() {
             <tbody>
                 ${rows.map(r => `
                     <tr>
-                        <td>${r.nome}</td>
+                        <td>${_escapeHtml(r.nome)}</td>
                         <td>${r.ini}kg</td>
                         <td>${r.atual}kg</td>
                         <td class="${r.delta >= 0 ? 'delta-positivo' : 'delta-negativo'}">${r.delta >= 0 ? '+' : ''}${r.delta.toFixed(2)}kg</td>
@@ -5628,10 +5650,12 @@ function isMissionPendingForViewDay(m, viewDate, viewKey) {
 }
 
 function _escapeHtml(s) {
-    return String(s || '')
+    return String(s == null ? '' : s)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
 
 function _getMissionCategoryLabel(m) {
@@ -5727,7 +5751,7 @@ function buildMissionCardHtmlVideo(m, viewKey, viewDate) {
     const rewardCoins = r.moedas > 0 ? `+${r.moedas} Coin` : '';
     const rewardLine = [rewardXp, rewardCoins].filter(Boolean).join(' | ');
 
-    const rec = getRecurrenceLabel(m.recurrence);
+    const rec = m.unique ? 'Única' : getRecurrenceLabel(m.recurrence);
     const attr = r.atributo ? String(r.atributo).toUpperCase() : '';
 
     const desc = m.descricao ? `<p class="vid-mission-desc">${_escapeHtml(m.descricao)}</p>` : '';
@@ -5850,7 +5874,7 @@ function updateSkillsDisplay() {
         <div class="pgi-block" style="margin-bottom:8px;">
             <div class="pgi-label" style="color:rgba(251,191,36,0.8);">PROPOSTA DO ARQUITETO</div>
             <div class="pgi-card" style="border-color:rgba(251,191,36,0.3);background:linear-gradient(145deg,rgba(251,191,36,0.05) 0%,rgba(6,8,14,0.95) 100%);">
-                <div class="pgi-card-main" style="color:rgba(251,191,36,0.9);">${proposta.nome}</div>
+                <div class="pgi-card-main" style="color:rgba(251,191,36,0.9);">${_escapeHtml(proposta.nome)}</div>
                 <div class="pgi-card-sub">${proposta.descricao || ''}</div>
                 <div class="pgi-card-sub">Tipo: ${proposta.tipo === 'combate' ? 'COMBATE' : 'ESTUDO'} · Atributo: ${(proposta.atributo || '').toUpperCase()}</div>
                 <div class="pgi-card-sub">Baseada em ${proposta.diasUnicos || '?'} dias de prática consistente.</div>
@@ -5880,7 +5904,7 @@ function updateSkillsDisplay() {
                 <div class="pgi-label">${tipoCap}</div>
                 <div class="pgi-card">
                     <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <div class="pgi-card-main">${skill.nome}</div>
+                        <div class="pgi-card-main">${_escapeHtml(skill.nome)}</div>
                         <div style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;color:rgba(0,229,255,0.8);flex-shrink:0;">NV ${skill.level}</div>
                     </div>
                     <div class="bar-wrapper pgi-bar"><div class="bar-fill exp-bar" style="width:${pct}%"></div></div>
@@ -6013,7 +6037,7 @@ function updateRunesDisplay() {
                         <div style="font-size:0.55rem;font-weight:700;letter-spacing:0.12em;color:rgba(192,132,252,0.7);flex-shrink:0;">MP ${runa.mpCost}</div>
                     </div>
                     <div class="pgi-card-sub">${runa.descricao || ''}</div>
-                    ${skill ? `<div class="pgi-card-sub">Habilidade: ${skill.nome} · Lv ${skill.level}</div>` : ''}
+                    ${skill ? `<div class="pgi-card-sub">Habilidade: ${_escapeHtml(skill.nome)} · Lv ${skill.level}</div>` : ''}
                     <button onclick="useRune(${runa.id})" ${isActive || !mpOk ? 'disabled' : ''} style="margin-top:6px;width:100%;padding:5px 0;border:1px solid ${btnColor};border-radius:5px;background:transparent;color:${btnColor};font-size:0.6rem;font-weight:700;letter-spacing:0.12em;cursor:${isActive || !mpOk ? 'default' : 'pointer'};">${btnLabel}</button>
                 </div>
             </div>`;
@@ -6123,7 +6147,7 @@ function renderSkillsInTraining() {
                                     return `
                                         <div class="training-item" data-skill-id="${skill.id}">
                                             <div class="training-header">
-                                                <span class="training-name">${skill.nome}</span>
+                                                <span class="training-name">${_escapeHtml(skill.nome)}</span>
                                                 <span class="training-type">[NÍVEL ${skill.level}]</span>
                                             </div>
                                             <div class="training-details">
@@ -6152,7 +6176,7 @@ function renderSkillsInTraining() {
                                     return `
                                         <div class="training-item" data-skill-id="${skill.id}">
                                             <div class="training-header">
-                                                <span class="training-name">${skill.nome}</span>
+                                                <span class="training-name">${_escapeHtml(skill.nome)}</span>
                                                 <span class="training-type">[NÍVEL ${skill.level}]</span>
                                             </div>
                                             <div class="training-details">
@@ -6829,8 +6853,8 @@ function initShopSystem() {
                             <span class="vid-shop-badge vid-shop-badge--time">${it.time}</span>
                         </span>
                     </div>
-                    <div class="vid-shop-card-title">${it.name}</div>
-                    <div class="vid-shop-card-desc">${it.desc}</div>
+                    <div class="vid-shop-card-title">${_escapeHtml(it.name)}</div>
+                    <div class="vid-shop-card-desc">${_escapeHtml(it.desc)}</div>
                 </button>
             `;
         }).join('');
@@ -6878,12 +6902,12 @@ function initShopSystem() {
                 </div>
                 ${items.length > 0 ? items.map((item, index) => {
                     const iconHtml = item.iconImage 
-                        ? `<img src="${item.iconImage}" alt="${item.name}" class="shop-item-icon-img">`
+                        ? `<img src="${item.iconImage}" alt="${_escapeHtml(item.name)}" class="shop-item-icon-img">`
                         : (item.icon || '🎁');
                     return `
-                        <div class="shop-item-box" data-item-index="${index}" data-item-name="${item.name}" data-item-price="${item.price}" data-item-icon="${item.icon || ''}" data-item-icon-image="${item.iconImage || ''}" data-item-type="recompensa">
+                        <div class="shop-item-box" data-item-index="${index}" data-item-name="${_escapeHtml(item.name)}" data-item-price="${item.price}" data-item-icon="${item.icon || ''}" data-item-icon-image="${item.iconImage || ''}" data-item-type="recompensa">
                             <div class="shop-item-icon">${iconHtml}</div>
-                            <div class="shop-item-name">${item.name}</div>
+                            <div class="shop-item-name">${_escapeHtml(item.name)}</div>
                             <div class="shop-item-price">${item.price.toLocaleString('pt-BR')} G</div>
                             <div style="display: flex; gap: 5px; margin-top: 8px;">
                                 <button class="form-btn task-small-btn task-edit-btn" onclick="editReward(${index})" style="flex: 1; font-size: 10px; padding: 4px;">EDITAR</button>
@@ -6896,12 +6920,12 @@ function initShopSystem() {
         } else {
             shopItemsList.innerHTML = items.map(item => {
                 const iconHtml = item.iconImage 
-                    ? `<img src="${item.iconImage}" alt="${item.name}" class="shop-item-icon-img">`
+                    ? `<img src="${item.iconImage}" alt="${_escapeHtml(item.name)}" class="shop-item-icon-img">`
                     : item.icon;
                 return `
-                    <div class="shop-item-box" data-item-name="${item.name}" data-item-price="${item.price}" data-item-icon="${item.icon || ''}" data-item-icon-image="${item.iconImage || ''}" data-item-hp="${item.hpRecovery || 0}" data-item-type="${item.type || 'pocao'}">
+                    <div class="shop-item-box" data-item-name="${_escapeHtml(item.name)}" data-item-price="${item.price}" data-item-icon="${item.icon || ''}" data-item-icon-image="${item.iconImage || ''}" data-item-hp="${item.hpRecovery || 0}" data-item-type="${item.type || 'pocao'}">
                         <div class="shop-item-icon">${iconHtml}</div>
-                        <div class="shop-item-name">${item.name}</div>
+                        <div class="shop-item-name">${_escapeHtml(item.name)}</div>
                         <div class="shop-item-price">${item.price.toLocaleString('pt-BR')} G</div>
                         ${item.hpRecovery ? `<div style="font-size: 10px; color: rgba(68,255,68,0.8); margin-top: 4px;">+${item.hpRecovery} HP</div>` : ''}
                     </div>
@@ -6937,14 +6961,14 @@ function initShopSystem() {
                 ${pocoes.length > 0 ? pocoes.map((item) => {
                     const realIndex = inventario.indexOf(item);
                     const iconHtml = item.iconImage 
-                        ? `<img src="${item.iconImage}" alt="${item.name}" style="width: 40px; height: 40px; object-fit: contain;">`
+                        ? `<img src="${item.iconImage}" alt="${_escapeHtml(item.name)}" style="width: 40px; height: 40px; object-fit: contain;">`
                         : (item.icon || '🧪');
                     return `
                         <div class="shop-item-box" style="margin-bottom: 10px;">
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <div style="font-size: 32px;">${iconHtml}</div>
                                 <div style="flex: 1;">
-                                    <div class="shop-item-name">${item.name}</div>
+                                    <div class="shop-item-name">${_escapeHtml(item.name)}</div>
                                     <div style="font-size: 11px; color: rgba(255,255,255,0.7);">Quantidade: ${item.quantity}</div>
                                     ${item.hpRecovery ? `<div style="font-size: 10px; color: rgba(68,255,68,0.8);">+${item.hpRecovery} HP</div>` : ''}
                                 </div>
@@ -6962,14 +6986,14 @@ function initShopSystem() {
                 ${recompensas.length > 0 ? recompensas.map((item) => {
                     const realIndex = inventario.indexOf(item);
                     const iconHtml = item.iconImage 
-                        ? `<img src="${item.iconImage}" alt="${item.name}" style="width: 40px; height: 40px; object-fit: contain;">`
+                        ? `<img src="${item.iconImage}" alt="${_escapeHtml(item.name)}" style="width: 40px; height: 40px; object-fit: contain;">`
                         : (item.icon || '🎁');
                     return `
                         <div class="shop-item-box" style="margin-bottom: 10px;">
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <div style="font-size: 32px;">${iconHtml}</div>
                                 <div style="flex: 1;">
-                                    <div class="shop-item-name">${item.name}</div>
+                                    <div class="shop-item-name">${_escapeHtml(item.name)}</div>
                                     <div style="font-size: 11px; color: rgba(255,255,255,0.7);">Quantidade: ${item.quantity}</div>
                                 </div>
                                 <button class="form-btn submit-btn task-small-btn" onclick="useInventoryItem(${realIndex})" style="font-size: 10px; padding: 6px;">USAR</button>
@@ -7095,8 +7119,9 @@ function initShopSystem() {
                 price: currentItem.price
             }, qty);
             
+            const bought = currentItem; // closeShopModal() zera currentItem
             closeShopModal();
-            gameSystem.addNotification('COMPRA REALIZADA!', `Você comprou ${qty}x ${currentItem.name}! Os itens foram adicionados ao inventário.`, 'coins');
+            gameSystem.addNotification('COMPRA REALIZADA!', `Você comprou ${qty}x ${bought.name}! Os itens foram adicionados ao inventário.`, 'coins');
             
             // Atualizar display se estiver na aba inventário
             const activeTab = document.querySelector('.shop-tab-btn.active');
@@ -7456,10 +7481,32 @@ function getTaskRewardsFromForm() {
     };
 }
 
+// Soma os buffs de runas (passivas possuídas + temporárias ativas) de um tipo.
+function getRunaBuffTotal(buffType) {
+    if (!gameSystem || typeof RUNAS_CATALOG === 'undefined') return 0;
+    return RUNAS_CATALOG.reduce((sum, r) => {
+        if (r.buffType !== buffType) return sum;
+        const on = r.tipo === 'passiva' ? gameSystem.isRunaCatalogoPassivaAtiva(r.id) : !!gameSystem.getRunaCatalogoAtiva(r.id);
+        return on ? sum + (r.buffValue || 0) : sum;
+    }, 0);
+}
+
 function applyTaskRewards(task) {
     if (!gameSystem || !task.rewards) return;
 
-    const { exp, moedas, atributo, atributoValor } = task.rewards;
+    const { atributo, atributoValor } = task.rewards;
+    let { exp, moedas } = task.rewards;
+
+    // Runas: multiplicadores de XP/moedas (antes só apareciam na UI, sem efeito).
+    const isHabit = task.tipo === 'habito';
+    let expPct = getRunaBuffTotal('exp_multiplier');
+    if (isHabit) expPct += getRunaBuffTotal('exp_multiplier_habitos');
+    if (String(task.category || '').toUpperCase() === 'ESTUDOS') expPct += getRunaBuffTotal('exp_multiplier_estudo');
+    if (gameSystem.countTarefasCompletasHoje() >= 3) expPct += getRunaBuffTotal('exp_multiplier_dia_3plus');
+    if (exp > 0 && expPct) exp = Math.round(exp * (1 + expPct / 100));
+    const coinPct = getRunaBuffTotal('coin_multiplier');
+    if (moedas > 0 && coinPct) moedas = Math.round(moedas * (1 + coinPct / 100));
+    if (!isHabit) moedas = (moedas || 0) + getRunaBuffTotal('coin_bonus_flat');
 
     let gaveExp = false;
     if (exp && exp > 0) {
@@ -7469,28 +7516,17 @@ function applyTaskRewards(task) {
     if (moedas && moedas > 0) {
         gameSystem.addMoedas(moedas);
     }
-    if (atributo && atributoValor && atributoValor > 0) {
-        const attrMap = {
-            forca: 'addForca',
-            sabedoria: 'addSabedoria',
-            foco: 'addFoco',
-            vitalidade: 'addVitalidade',
-            disciplina: 'addDisciplina',
-            carisma: 'addCarisma'
-        };
-        const fnName = attrMap[atributo];
-        if (fnName && typeof gameSystem[fnName] === 'function') {
-            if (fnName === 'addVitalidade' || fnName === 'addDisciplina') {
-                gameSystem[fnName]();
-            } else {
-                gameSystem[fnName](atributoValor);
-            }
-        }
+    // Valor do atributo é aplicado direto (as funções addX() multiplicam por taxas próprias e ignoravam o valor).
+    if (atributo && atributoValor && atributoValor > 0 && gameSystem.data.atributos && atributo in gameSystem.data.atributos) {
+        gameSystem.data.atributos[atributo] += Number(atributoValor);
+        gameSystem.updateAttributesDisplay();
+        gameSystem.saveData();
     }
     /* Missão/hábito com 0 EXP: addExp não corre — actualizar Painel («Completas hoje», etc.) */
     if (!gaveExp && typeof gameSystem.updateStatusDisplay === 'function') {
         gameSystem.updateStatusDisplay();
     }
+    return { exp: exp || 0, moedas: moedas || 0 };
 }
 
 function _missionsRewardChips(m) {
@@ -7605,7 +7641,7 @@ function _buildHabitRowHtml(h, todayKey) {
             <div class="task-main">
                 <label class="task-checkbox-wrapper">
                     <input type="checkbox" class="task-complete-checkbox" ${completed ? 'checked disabled' : ''}>
-                    <span class="task-name">${h.titulo}</span>
+                    <span class="task-name">${_escapeHtml(h.titulo)}</span>
                 </label>
                 <span class="task-tag">HÁBITO</span>
             </div>
@@ -7769,13 +7805,27 @@ function renderTasks() {
                 const appears = shouldTaskAppearToday(task, viewDt);
                 if (doneForUi || (!appears && !isUnique)) return;
 
+                // Barra de progresso: cada clique soma +1; só conclui (e paga) ao atingir o máximo
+                if (task.progress && task.progress.enabled && task.progress.max > 0) {
+                    if (!task.progress.byDate) task.progress.byDate = {};
+                    const cur = task.progress.byDate[viewKeyLocal] || 0;
+                    if (cur + 1 < task.progress.max) {
+                        task.progress.byDate[viewKeyLocal] = cur + 1;
+                        gameSystem.saveData();
+                        showToast(`Progresso ${cur + 1}/${task.progress.max}`, 'info');
+                        renderTasks();
+                        return;
+                    }
+                    task.progress.byDate[viewKeyLocal] = task.progress.max;
+                }
+
                 completeRecurringTask(task, viewKeyLocal);
-                applyTaskRewards(task);
+                const applied = applyTaskRewards(task);
                 gameSystem.saveData();
                 if (typeof gameSystem.verificarDesafiosArquiteto === 'function') gameSystem.verificarDesafiosArquiteto();
                 if (typeof gameSystem.checkRunasCatalogo === 'function') gameSystem.checkRunasCatalogo();
 
-                const r = task.rewards || {};
+                const r = applied || task.rewards || {};
                 const xpPart = r.exp > 0 ? `+${r.exp} XP` : null;
                 const cPart = r.moedas > 0 ? `+${r.moedas} Coin` : null;
                 const line = [xpPart, cPart].filter(Boolean).join(' | ');
@@ -8975,7 +9025,7 @@ function showAllTasksModal() {
                 <ul class="section-text" style="list-style: none; padding-left: 0; margin-top: 8px;">
                     ${habitos.map(h => `
                         <li style="margin-bottom: 4px;">
-                            - ${h.titulo}
+                            - ${_escapeHtml(h.titulo)}
                         </li>
                     `).join('')}
                 </ul>` : '<div class="section-text">Nenhum hábito cadastrado.</div>'}
@@ -8987,7 +9037,7 @@ function showAllTasksModal() {
                 <ul class="section-text" style="list-style: none; padding-left: 0; margin-top: 8px;">
                     ${missoes.map(m => `
                         <li style="margin-bottom: 4px;">
-                            - ${m.titulo} ${m.unique ? '(ÚNICA)' : '(RECORRENTE)'}
+                            - ${_escapeHtml(m.titulo)} ${m.unique ? '(ÚNICA)' : '(RECORRENTE)'}
                         </li>
                     `).join('')}
                 </ul>` : '<div class="section-text">Nenhuma missão cadastrada.</div>'}
@@ -8999,7 +9049,7 @@ function showAllTasksModal() {
                 <ul class="section-text" style="list-style: none; padding-left: 0; margin-top: 8px;">
                     ${uniqueInProgress.map(m => `
                         <li style="margin-bottom: 6px;">
-                            <div>${m.titulo} ${m.priority ? '[' + m.priority.toUpperCase() + ']' : ''} ${m.category ? '- ' + m.category : ''}</div>
+                            <div>${_escapeHtml(m.titulo)} ${m.priority ? '[' + m.priority.toUpperCase() + ']' : ''} ${m.category ? '- ' + m.category : ''}</div>
                             <div style="font-size: 11px; color: rgba(255,255,255,0.7);">
                                 Início: ${(() => {
                                     const start = m.startDate || (m.recurrence && m.recurrence.startDate);
@@ -9028,7 +9078,7 @@ function showAllTasksModal() {
                         const [ey, em, ed] = getDateKey(lastCompletion).split('-');
                         return `
                         <li style="margin-bottom: 8px;">
-                            <div>${m.titulo} ${m.priority ? '[' + m.priority.toUpperCase() + ']' : ''} ${m.category ? '- ' + m.category : ''}</div>
+                            <div>${_escapeHtml(m.titulo)} ${m.priority ? '[' + m.priority.toUpperCase() + ']' : ''} ${m.category ? '- ' + m.category : ''}</div>
                             <div style="font-size: 11px; color: rgba(255,255,255,0.75);">
                                 Início: ${sd}/${sm}/${sy} &nbsp;|&nbsp; Conclusão: ${ed}/${em}/${ey}
                             </div>
@@ -9307,7 +9357,7 @@ async function callOpenRouter(messages, modelIndex) {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + apiKey,
                 'HTTP-Referer': window.location.href,
-                'X-Title': 'System Level Up — Arquiteto IA'
+                'X-Title': 'System Level Up - Arquiteto IA' // ASCII: travessão (U+2014) invalida o header e quebra o fetch
             },
             body: JSON.stringify({ model, messages, max_tokens: 600, temperature: 0.8 })
         });
@@ -10014,8 +10064,8 @@ function renderItensRecompensa(filter) {
         return `<div class="item-card item-card--${rar} ${isUnlocked ? '' : 'locked'}">
             ${lock}
             <div class="item-card-icon">${item.emoji}</div>
-            <div class="item-card-name">${item.nome}</div>
-            <div class="item-card-desc">${item.desc}</div>
+            <div class="item-card-name">${_escapeHtml(item.nome)}</div>
+            <div class="item-card-desc">${_escapeHtml(item.desc)}</div>
             <span class="item-rarity-badge rarity-${rar}">${rar}</span>
             ${isUnlocked && item.xpReq > 0 ? `<div class="item-xp-req">XP: ${item.xpReq.toLocaleString()}</div>` : ''}
             ${isCustom ? `<div class="item-card-actions">
@@ -10160,7 +10210,7 @@ function renderMatrizPrioridades() {
         listEl.innerHTML = tasks.map((t, idx) => `
             <div class="mz-task-item ${t.done ? 'done' : ''}" data-q="${q}" data-idx="${idx}">
                 <div class="mz-task-check">${t.done ? '✓' : ''}</div>
-                <span>${t.texto}</span>
+                <span>${_escapeHtml(t.texto)}</span>
                 <span class="mz-task-remove" data-q="${q}" data-idx="${idx}">×</span>
             </div>`).join('');
     });
