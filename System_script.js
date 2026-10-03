@@ -9498,7 +9498,7 @@ function _detectarCandidatosHabilidade() {
 
 async function analisarRotinaParaHabilidade() {
     if (!gameSystem) return;
-    const apiKey = gameSystem.data.openrouterApiKey || '';
+    const apiKey = getOpenRouterKey();
     if (!apiKey) return; // Sem chave de API, não faz análise
 
     // Não roda mais de 1x por semana

@@ -11391,3 +11391,16 @@ body.sys-app .mission-video-box--nova.settings-box {
         white-space: normal;
     }
 }
+/* ===== Mobile / toque + card de backup e sync ===== */
+html { overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; }
+body.sys-app { padding-bottom: env(safe-area-inset-bottom, 0px); padding-top: env(safe-area-inset-top, 0px); }
+@media (pointer: coarse) {
+    button, .sys-nav-item, [role="button"], select, input[type="checkbox"] { min-height: 44px; }
+    button, .sys-nav-item { touch-action: manipulation; }
+}
+.sys-sync-card { margin: 1rem 0; padding: 1rem; border: 1px solid rgba(0,229,255,.25); border-radius: 12px; background: rgba(5,7,13,.6); display: flex; flex-direction: column; gap: .6rem; }
+.sys-sync-card h3, .sys-sync-card h4 { margin: 0; font-family: Orbitron, sans-serif; color: #5eead4; }
+.sys-sync-card input:not([hidden]) { padding: .7rem; border-radius: 8px; border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.05); color: inherit; font-size: 16px; }
+.sys-sync-row { display: flex; flex-wrap: wrap; gap: .5rem; }
+.sys-sync-row button, .sys-sync-btn { padding: .6rem 1rem; border-radius: 8px; border: 1px solid rgba(0,229,255,.4); background: rgba(0,229,255,.1); color: #5eead4; cursor: pointer; display: inline-flex; align-items: center; }
+.sys-sync-status { font-size: .85rem; opacity: .8; }
