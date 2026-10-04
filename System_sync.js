@@ -7,6 +7,7 @@
     const TS_KEY = 'sysSyncLocalTs';   // quando o dado local mudou
     const LAST_KEY = 'sysSyncLastTs';  // updated_at remoto da última sincronização
     const HASH_KEY = 'sysSyncDataHash'; // hash canônico do último dado sincronizado
+    const OWNER_KEY = 'sysSyncOwner';  // user_id dono dos dados locais
     const BACKUP_KEYS = [DATA_KEY, 'lastPenaltyCheckDate', 'penaltySystemInitialized'];
     const rd = k => { try { return localStorage.getItem(k); } catch (_) { return null; } };
     // Projeto Supabase dedicado (chave publishable é pública por design; a segurança é a RLS da tabela saves).
@@ -76,7 +77,7 @@
         if (auth) h.Authorization = 'Bearer ' + (await token());
         const res = await fetch(c.url.replace(/\/$/, '') + path, Object.assign({}, opt, { headers: h }));
         const j = await res.json().catch(() => null);
-        if (!res.ok) throw new Error((j && (j.msg || j.error_description || j.message)) || 'HTTP ' + res.status);
+        if (!res.ok) { const e = new Error((j && (j.msg || j.error_description || j.message)) || 'HTTP ' + res.status); e.status = res.status; throw e; }
         return j;
     }
 
@@ -84,6 +85,7 @@
         const c = cfg();
         c.access = j.access_token; c.refresh = j.refresh_token; c.exp = Date.now() + (j.expires_in - 60) * 1000;
         c.uid = j.user && j.user.id || c.uid;
+        if (j.user && j.user.email) c.email = j.user.email;
         saveCfg(c);
     }
 
@@ -91,17 +93,71 @@
         const c = cfg();
         if (c.access && Date.now() < c.exp) return c.access;
         if (!c.refresh) throw new Error('Faça login na sincronização.');
-        keepSession(await sb('/auth/v1/token?grant_type=refresh_token', { method: 'POST', body: JSON.stringify({ refresh_token: c.refresh }) }));
+        try { keepSession(await sb('/auth/v1/token?grant_type=refresh_token', { method: 'POST', body: JSON.stringify({ refresh_token: c.refresh }) })); }
+        catch (e) { if (e.status >= 400 && e.status < 500) { clearSession(); location.reload(); } throw e; } // sessão revogada: volta ao login
         return cfg().access;
     }
 
+    function clearSession() { const k = cfg(); ['access', 'refresh', 'exp', 'uid'].forEach(f => delete k[f]); saveCfg(k); }
+
+    // 'ok' = sessão aberta; 'confirm' = conta criada, falta confirmar o e-mail
     async function auth(mode, email, pass) {
-        const c = cfg(); c.email = email; saveCfg(c);
         const path = mode === 'signup' ? '/auth/v1/signup' : '/auth/v1/token?grant_type=password';
         const j = await sb(path, { method: 'POST', body: JSON.stringify({ email, password: pass }) });
-        if (!j.access_token) throw new Error('Conta criada. Confirme o e-mail e faça login.');
+        if (!j.access_token) return 'confirm';
         keepSession(j);
+        await afterLogin(j.user.id);
+        return 'ok';
     }
+
+    const recover = email => sb('/auth/v1/recover', { method: 'POST', body: JSON.stringify({ email }) });
+    const setPassword = pass => sb('/auth/v1/user', { method: 'PUT', body: JSON.stringify({ password: pass }) }, true);
+
+    // Dados locais de outra conta nunca se misturam com a conta que entrou: guarda cópia e limpa.
+    function wipeLocal() {
+        const bk = {}; BACKUP_KEYS.forEach(k => { const v = rd(k); if (v != null) bk[k] = v; });
+        if (bk[DATA_KEY]) origSet.call(localStorage, 'sysPreLoginBackup', JSON.stringify(bk));
+        BACKUP_KEYS.concat(['sl_identity_name', TS_KEY, LAST_KEY, HASH_KEY]).forEach(k => localStorage.removeItem(k));
+    }
+
+    // Conta nova: nuvem vazia, app reinicia zerado e pede o nome (tela IDENTIDADE).
+    async function afterLogin(uid) {
+        const sameUser = rd(OWNER_KEY) === uid;
+        if (!sameUser) wipeLocal();
+        origSet.call(localStorage, OWNER_KEY, uid);
+        if (sameUser) await sync(true); else { const remote = await pull(); if (remote) return applyRemote(remote); }
+        location.reload();
+    }
+
+    async function googleStart() {
+        const s = await sb('/auth/v1/settings', { method: 'GET' });
+        if (!(s.external && s.external.google)) throw new Error('Login com Google ainda não foi ativado (veja GUIA_LOGIN.md).');
+        const native = !!window.Capacitor;
+        const redirect = native ? 'com.systemlevelup.app://login' : location.origin + location.pathname;
+        const url = cfg().url + '/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(redirect);
+        const B = native && window.Capacitor.Plugins && window.Capacitor.Plugins.Browser;
+        if (B) B.open({ url }); else location.href = url;
+    }
+
+    // Retorno de Google / link de e-mail / recuperação: tokens vêm no #fragmento.
+    async function consumeHash(hash) {
+        const p = new URLSearchParams((hash || '').replace(/^#/, ''));
+        if (!p.get('access_token')) return null;
+        const t = { access_token: p.get('access_token'), refresh_token: p.get('refresh_token'), expires_in: +p.get('expires_in') || 3600 };
+        keepSession(t);
+        const u = await sb('/auth/v1/user', { method: 'GET' }, true);
+        keepSession(Object.assign({}, t, { user: u }));
+        if (p.get('type') === 'recovery') return 'recovery';
+        await afterLogin(u.id);
+        return 'ok';
+    }
+    const hashJob = location.hash.includes('access_token') ? (() => { const h = location.hash; history.replaceState(null, '', location.pathname + location.search); return consumeHash(h); })() : Promise.resolve(null);
+    const A = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+    if (A && A.addListener) A.addListener('appUrlOpen', e => {
+        const i = (e.url || '').indexOf('#'); if (i < 0) return;
+        const B = window.Capacitor.Plugins.Browser; if (B && B.close) B.close().catch(() => {});
+        consumeHash(e.url.slice(i)).catch(err => toast('Login falhou: ' + err.message, 'error'));
+    });
 
     async function pull() {
         const rows = await sb('/rest/v1/saves?select=data,updated_at', { method: 'GET' }, true);
@@ -121,6 +177,8 @@
         origSet.call(localStorage, LAST_KEY, ts);
         origSet.call(localStorage, HASH_KEY, dataHash(raw));
     }
+
+    if (cfg().uid && !rd(OWNER_KEY)) origSet.call(localStorage, OWNER_KEY, cfg().uid); // sessão anterior ao login obrigatório
 
     let pushTimer = null;
     function schedulePush() {
@@ -164,39 +222,32 @@
     function buildUI() {
         const host = document.querySelector('#configuracoesSection .cfg-sections') || document.getElementById('configuracoesSection'); // .cfg-sections é a área rolável
         if (!host || document.getElementById('sysSyncCard')) return;
-        const c = cfg();
         const card = document.createElement('div');
         card.id = 'sysSyncCard';
         card.className = 'sys-sync-card';
         card.innerHTML =
-            '<h3>Backup e sincronização</h3>' +
+            '<h3>Conta e backup</h3>' +
+            '<div id="sysSyncStatus" class="sys-sync-status" role="status"></div>' +
+            '<div class="sys-sync-row"><button type="button" id="sysSbNow">Sincronizar agora</button><button type="button" id="sysSbOut">Sair da conta</button></div>' +
             '<div class="sys-sync-row"><button type="button" id="sysBkExp">Exportar backup</button>' +
-            '<label class="sys-sync-btn">Importar backup<input type="file" id="sysBkImp" accept="application/json" hidden></label></div>' +
-            '<h4>Sincronizar com a nuvem (Supabase)</h4>' +
-            '<input id="sysSbUrl" placeholder="URL do projeto (https://xxx.supabase.co)" autocomplete="off">' +
-            '<input id="sysSbAnon" placeholder="Chave anon (publishable)" autocomplete="off">' +
-            '<input id="sysSbEmail" type="email" placeholder="E-mail" autocomplete="username">' +
-            '<input id="sysSbPass" type="password" placeholder="Senha (mín. 6)" autocomplete="current-password">' +
-            '<div class="sys-sync-row"><button type="button" id="sysSbLogin">Entrar</button><button type="button" id="sysSbSignup">Criar conta</button>' +
-            '<button type="button" id="sysSbNow">Sincronizar agora</button><button type="button" id="sysSbOut">Sair</button></div>' +
-            '<div id="sysSyncStatus" class="sys-sync-status" role="status"></div>';
+            '<label class="sys-sync-btn">Importar backup<input type="file" id="sysBkImp" accept="application/json" hidden></label></div>';
         host.appendChild(card);
         statusEl = card.querySelector('#sysSyncStatus');
         const $ = id => card.querySelector('#' + id);
-        $('sysSbUrl').value = c.url || ''; $('sysSbAnon').value = c.anon || ''; $('sysSbEmail').value = c.email || '';
-        setStatus(c.refresh ? 'Conectado como ' + (c.email || '') : 'Desconectado');
+        setStatus('Conectado como ' + (cfg().email || ''));
         $('sysBkExp').onclick = exportBackup;
         $('sysBkImp').onchange = e => e.target.files[0] && importBackup(e.target.files[0]);
-        const run = (fn) => async () => {
-            const cur = cfg(); cur.url = $('sysSbUrl').value.trim(); cur.anon = $('sysSbAnon').value.trim(); saveCfg(cur);
-            try { await fn(); } catch (e) { setStatus('Erro: ' + e.message); }
-        };
-        const login = mode => run(async () => { await auth(mode, $('sysSbEmail').value.trim(), $('sysSbPass').value); $('sysSbPass').value = ''; setStatus('Conectado.'); await sync(true); });
-        $('sysSbLogin').onclick = login('login');
-        $('sysSbSignup').onclick = login('signup');
-        $('sysSbNow').onclick = run(async () => { setStatus('Sincronizando…'); await sync(true); });
-        $('sysSbOut').onclick = () => { const k = cfg(); delete k.access; delete k.refresh; delete k.exp; delete k.uid; saveCfg(k); setStatus('Desconectado'); };
+        $('sysSbNow').onclick = async () => { setStatus('Sincronizando…'); try { await sync(true); } catch (e) { setStatus('Erro: ' + e.message); } };
+        $('sysSbOut').onclick = () => { if (confirm('Sair da conta? Os dados continuam na nuvem.')) { clearSession(); location.reload(); } };
     }
+
+    window.SysAuth = {
+        loggedIn: () => !!cfg().refresh,
+        ready: hashJob,
+        login: (email, pass) => auth('login', email, pass),
+        signup: (email, pass) => auth('signup', email, pass),
+        recover, setPassword, google: googleStart, finishRecovery: () => afterLogin(cfg().uid)
+    };
 
     document.addEventListener('DOMContentLoaded', () => {
         buildUI();

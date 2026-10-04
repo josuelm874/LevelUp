@@ -11417,3 +11417,31 @@ body.sys-app { padding-bottom: env(safe-area-inset-bottom, 0px); padding-top: en
 .vsi-time { font-size: .75rem; opacity: .6; }
 .vsi-use { padding: .5rem .9rem; border-radius: 8px; border: 1px solid rgba(0,229,255,.4); background: rgba(0,229,255,.1); color: #5eead4; cursor: pointer; }
 .vsi-empty, .vsi-shield { opacity: .75; font-size: .9rem; }
+
+/* ===== Portão de login (System_login.js) ===== */
+.sl-gate { position: fixed; inset: 0; z-index: 100000; overflow-y: auto; display: flex; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+    background: radial-gradient(ellipse at 50% 45%, rgba(10,70,160,.35), transparent 62%), repeating-linear-gradient(0deg, rgba(40,120,255,.05) 0 1px, transparent 1px 4px), #02050c; font-family: Rajdhani, Inter, sans-serif; color: #d8ecff; }
+.sl-gate::before, .sl-gate::after { content: ''; position: fixed; left: 0; right: 0; height: 14px; background: linear-gradient(90deg, transparent, #1a8cff 18%, #7fe3ff 50%, #1a8cff 82%, transparent); box-shadow: 0 0 22px 4px rgba(26,140,255,.75); pointer-events: none; }
+.sl-gate::before { top: max(10px, env(safe-area-inset-top)); clip-path: polygon(0 0, 100% 0, 92% 100%, 8% 100%); }
+.sl-gate::after { bottom: max(10px, env(safe-area-inset-bottom)); clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%); }
+.sl-frame { margin: auto; width: min(100%, 430px); position: relative; padding: 2px; background: linear-gradient(160deg, #54d4ff, #1a6bff 45%, #54d4ff); clip-path: polygon(0 18px, 18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px)); filter: drop-shadow(0 0 10px rgba(26,140,255,.9)); }
+.sl-panel { padding: 22px 22px 20px; background: linear-gradient(180deg, rgba(4,14,34,.97), rgba(2,8,20,.97)); clip-path: inherit; text-align: center; }
+.sl-logo { width: 96px; height: 96px; margin: 0 auto 4px; display: block; mix-blend-mode: screen; -webkit-mask-image: radial-gradient(circle, #000 52%, transparent 70%); mask-image: radial-gradient(circle, #000 52%, transparent 70%); }
+.sl-head { display: flex; align-items: center; gap: 10px; justify-content: center; margin: 4px 0 6px; }
+.sl-ico { width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid #9fe8ff; border-radius: 50%; color: #9fe8ff; font: 700 1rem Inter, sans-serif; box-shadow: 0 0 8px rgba(0,229,255,.6); }
+.sl-title { margin: 0; padding: 6px 16px; border: 1px solid rgba(190,235,255,.7); font: 800 1.15rem Orbitron, sans-serif; letter-spacing: .12em; color: #eaffff; text-shadow: 0 0 10px #00e5ff, 0 0 22px #00b8ff; }
+.sl-sub { margin: 8px 0 16px; font-size: .98rem; color: #9fc4e6; }
+.sl-form { display: flex; flex-direction: column; gap: 10px; }
+.sl-in { width: 100%; box-sizing: border-box; padding: 12px; font: 600 16px Rajdhani, sans-serif; letter-spacing: .06em; color: #eaffff; background: rgba(0,18,40,.7); border: 1px solid rgba(190,235,255,.45); border-radius: 0; outline: none; }
+.sl-in::placeholder { color: #5f86ad; }
+.sl-in:focus { border-color: #5ee7ff; box-shadow: 0 0 10px rgba(0,229,255,.55), inset 0 0 8px rgba(0,229,255,.2); }
+.sl-btn { padding: 12px; font: 700 .95rem Orbitron, sans-serif; letter-spacing: .12em; color: #eaffff; background: rgba(10,60,140,.35); border: 1px solid #5ee7ff; cursor: pointer; text-shadow: 0 0 8px #00e5ff; box-shadow: 0 0 10px rgba(0,229,255,.35); }
+.sl-btn:active { background: rgba(0,229,255,.25); }
+.sl-btn:disabled { opacity: .5; }
+.sl-google { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: .78rem; background: rgba(255,255,255,.06); border-color: rgba(190,235,255,.5); }
+.sl-or { display: flex; align-items: center; gap: 10px; margin: 14px 0; font-size: .8rem; color: #5f86ad; }
+.sl-or::before, .sl-or::after { content: ''; flex: 1; height: 1px; background: rgba(190,235,255,.25); }
+.sl-msg { min-height: 1.2em; font-size: .92rem; color: #9fe8ff; }
+.sl-msg.sl-bad { color: #ff7b8a; }
+.sl-links { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; }
+.sl-links button { background: none; border: 0; padding: 6px 0; color: #7fc6ff; font: 600 .95rem Rajdhani, sans-serif; text-decoration: underline; cursor: pointer; }
