@@ -5754,7 +5754,8 @@ function buildMissionCardHtmlVideo(m, viewKey, viewDate) {
     const r = m.rewards || {};
     const rewardXp = r.exp > 0 ? `+${r.exp} XP` : '';
     const rewardCoins = r.moedas > 0 ? `+${r.moedas} Coin` : '';
-    const rewardLine = [rewardXp, rewardCoins].filter(Boolean).join(' | ');
+    const rewardItem = r.item && r.item.name ? `🎁 ${r.item.name}` : '';
+    const rewardLine = [rewardXp, rewardCoins, rewardItem].filter(Boolean).join(' | ');
 
     const rec = m.unique ? 'Única' : getRecurrenceLabel(m.recurrence);
     const attr = r.atributo ? String(r.atributo).toUpperCase() : '';
@@ -7543,6 +7544,11 @@ function applyTaskRewards(task) {
     /* Missão/hábito com 0 EXP: addExp não corre — actualizar Painel («Completas hoje», etc.) */
     if (!gaveExp && typeof gameSystem.updateStatusDisplay === 'function') {
         gameSystem.updateStatusDisplay();
+    }
+    // Item de prêmio (missões especiais do Arquiteto) vai para o inventário
+    if (task.rewards.item && task.rewards.item.name) {
+        gameSystem.addToInventory({ name: task.rewards.item.name, icon: task.rewards.item.icon || '🎁', type: 'recompensa', hpRecovery: 0, price: 0, origem: 'arquiteto', em: new Date().toISOString() }, 1);
+        gameSystem.addNotification('ITEM CONQUISTADO!', 'O Arquiteto concedeu: ' + task.rewards.item.name + '. Veja em Itens de Recompensa.', 'coins');
     }
     return { exp: exp || 0, moedas: moedas || 0 };
 }

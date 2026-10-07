@@ -5,47 +5,6 @@
     const gs = () => (typeof gameSystem !== 'undefined' ? gameSystem : null);
     const $ = id => document.getElementById(id);
 
-    // ---------- Inventário (aba Loja) ----------
-    function renderInventory() {
-        const g = gs(); const host = $('vidShopInv'); if (!g || !host) return;
-        const inv = g.data.inventario || [];
-        const shield = g.data.escudoAte > Date.now()
-            ? `<div class="vsi-shield">🛡️ Escudo ativo até ${new Date(g.data.escudoAte).toLocaleString('pt-BR')}</div>` : '';
-        host.innerHTML = `<h3 class="vsi-title">Meu Inventário</h3>${shield}` + (inv.length
-            ? inv.map((it, i) => `<div class="vsi-row">
-                <span class="vsi-ico">${esc(it.icon || '🎁')}</span>
-                <span class="vsi-name">${esc(it.name)} <b>x${it.quantity}</b></span>
-                <button type="button" class="vsi-use" data-i="${i}">USAR</button></div>`).join('')
-            : '<div class="vsi-empty">Nenhum item. Compre na loja acima.</div>');
-    }
-
-    function useItem(i) {
-        const g = gs(); const it = (g.data.inventario || [])[i]; if (!it || it.quantity <= 0) return;
-        if (/ESCUDO/i.test(it.name)) {
-            if (g.data.escudoAte > Date.now()) { showToast('O Escudo já está ativo.', 'info'); return; }
-            g.data.escudoAte = Date.now() + 24 * 3600 * 1000;
-            it.quantity--;
-            if (it.quantity <= 0) g.data.inventario.splice(i, 1);
-            g.saveData();
-            g.addNotification('ESCUDO ATIVADO!', 'Penalidades automáticas bloqueadas por 24 horas.', 'info');
-        } else {
-            useInventoryItem(i); // poções/recompensas: lógica existente
-        }
-        renderInventory();
-    }
-
-    function mountInventory() {
-        const grid = $('vidShopGrid'); if (!grid || $('vidShopInv')) return;
-        const box = document.createElement('div'); box.id = 'vidShopInv'; box.className = 'vsi';
-        grid.parentElement.appendChild(box);
-        box.addEventListener('click', e => { const b = e.target.closest('.vsi-use'); if (b) useItem(+b.dataset.i); });
-        renderInventory();
-        document.querySelector('[data-tab="shop"]')?.addEventListener('click', () => setTimeout(renderInventory, 150));
-        // compra concluída -> atualiza a lista
-        const add = gs().addToInventory.bind(gs());
-        gs().addToInventory = function () { const r = add(...arguments); renderInventory(); return r; };
-    }
-
     // ---------- Histórico de compras ----------
     function mountHistory() {
         // captura no document: o app atribui b.onclick (stub "em desenvolvimento") depois do nosso mount
@@ -101,6 +60,6 @@
     patchPenalties();
     document.addEventListener('DOMContentLoaded', () => {
         if (!gs()) return;
-        mountInventory(); mountHistory(); mountToggle();
+        mountHistory(); mountToggle();
     });
 })();

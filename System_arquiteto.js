@@ -76,10 +76,11 @@ Você pode criar itens no Sistema. Quando o caçador pedir (missão, hábito, it
 1. Faça UMA pergunta curta por vez sobre o que faltar (objetivo, frequência, prazo ou datas, se precisa de checklist, prioridade, esforço). Se ele já deu tudo, não pergunte mais.
 2. Com informação suficiente, escreva NO MÁXIMO 2 frases curtas (sem repetir os dados que ele deu) e termine a resposta com UM bloco no formato exato, em JSON de uma linha só:
 \`\`\`acao
-{"tipo":"criar_missao","titulo":"...","descricao":"...","frequencia":"unica|diaria|semanal|mensal|anual|intervalo","intervalo":1,"dataInicial":"AAAA-MM-DD","dataFinal":"AAAA-MM-DD ou vazio","prioridade":"alta|media|baixa","periodo":"manha|tarde|noite|flex","segmento":"${SEGMENTS.join('|')}","checklist":["passo 1","passo 2"],"exp":60,"moedas":10,"atributo":"${ATTRS.join('|')}","atributoValor":0.5}
+{"tipo":"criar_missao","titulo":"...","descricao":"...","frequencia":"unica|diaria|semanal|mensal|anual|intervalo","intervalo":1,"dataInicial":"AAAA-MM-DD","dataFinal":"AAAA-MM-DD ou vazio","prioridade":"alta|media|baixa","periodo":"manha|tarde|noite|flex","segmento":"${SEGMENTS.join('|')}","checklist":["passo 1","passo 2"],"exp":60,"moedas":10,"atributo":"${ATTRS.join('|')}","atributoValor":0.5,"itemRecompensa":{"nome":"Sessão de jogo 1h","icone":"🎮"},"especial":true}
 \`\`\`
 Outros tipos: {"tipo":"criar_habito","titulo":"...","descricao":"...","frequencia":"diaria","dataInicial":"AAAA-MM-DD"} | {"tipo":"criar_item","nome":"...","icone":"emoji","preco":3000} | {"tipo":"propor_habilidade","nome":"...","tipoHab":"estudo|combate","atributo":"...","descricao":"..."}.
 - exp deve refletir o esforço real e a frequência: missão que se repete todo dia ou toda semana vale pouco (10 a 60); tarefa única de esforço médio 50 a 150; meta grande e única 150 a 400. Nunca passe de 500. moedas: 0 a 80 (0 para tarefas pequenas). atributoValor entre 0 e 2 (rotinas diárias 0.1 a 0.5).
+- itemRecompensa e especial só em MISSÃO ESPECIAL ou meta grande: um prêmio de lazer ou descanso realista e VARIADO (jogo, série, refeição livre, saída, descanso, doce). Não copie o exemplo do formato. Omita nos demais casos.
 - Nunca diga que já criou: o caçador confirma num cartão que o app mostra.`;
         }
         return p;
@@ -124,8 +125,10 @@ Outros tipos: {"tipo":"criar_habito","titulo":"...","descricao":"...","frequenci
             recurrence: unique ? { type: 'daily', interval: 1, startDate: start } : { type: REC_TYPE[freq] || 'daily', interval: Math.round(clampN(a.intervalo, 1, 365, 1)), startDate: start },
             rewards: { exp: exp, moedas: Math.round(clampN(a.moedas, 0, 80, 0)), atributo: attr, atributoValor: clampN(a.atributoValor, 0, 2, h.atributoValor || 0.5) },
             progress: { enabled: false, max: 0, byDate: {} },
-            criadoPeloArquiteto: true
+            criadoPeloArquiteto: true,
+            especial: !!a.especial
         };
+        if (a.itemRecompensa && a.itemRecompensa.nome) task.rewards.item = { name: String(a.itemRecompensa.nome).trim().toUpperCase().slice(0, 40), icon: String(a.itemRecompensa.icone || '🎁').slice(0, 4) };
         if (tipo === 'missao') {
             task.priority = ['alta', 'media', 'baixa'].indexOf(a.prioridade) >= 0 ? a.prioridade : 'media';
             const seg = String(a.segmento || '').toUpperCase();
@@ -187,6 +190,7 @@ Outros tipos: {"tipo":"criar_habito","titulo":"...","descricao":"...","frequenci
                 rows.push('Prioridade: ' + esc(a.prioridade || 'media') + (a.segmento ? ' · ' + esc(a.segmento) : ''));
                 if (Array.isArray(a.checklist) && a.checklist.length) rows.push('Checklist: ' + a.checklist.map(esc).join(' › '));
             }
+            if (a.itemRecompensa && a.itemRecompensa.nome) rows.push('🎁 Prêmio: ' + esc(a.itemRecompensa.nome) + (a.especial ? ' · missão especial' : ''));
             rows.push('Recompensa: ' + esc(a.exp != null ? a.exp : '?') + ' XP · ' + esc(a.moedas || 0) + ' G' + (a.atributo ? ' · +' + esc(a.atributoValor || 0.5) + ' ' + esc(a.atributo) : ''));
         } else if (a.tipo === 'criar_item') {
             title = 'NOVO ITEM: ' + esc(String(a.nome || '').toUpperCase());
@@ -337,8 +341,33 @@ Outros tipos: {"tipo":"criar_habito","titulo":"...","descricao":"...","frequenci
             const ok = await say('weekly', 'Resumo da semana: nível ' + lvl + ', ' + recentFailures(7).length + ' falhas nos últimos 7 dias, treinos ' + (d.treinosSemana || []).length + '/' + (d.treinoMeta || 5) + '.',
                 'A semana termina. Revise suas falhas e prepare a próxima.');
             if (ok) { const t = readState(); t.weekKey = wk; writeState(t); }
+            return;
+        }
+        const pendEsp = (d.missoes || []).some(m => m.especial && m.ativo !== false && !(m.completions || []).length && (!m.endDate || m.endDate >= today));
+        if (!pendEsp && (!s.especialAt || Date.now() - s.especialAt > 7 * 86400000)) {
+            try { await proposeSpecial(); } catch (e) { /* tenta de novo na próxima verificação */ }
         }
     }
+    async function proposeSpecial() {
+        const g = gs(), s = readState(), today = localDateKey(new Date());
+        if (s.day !== today) { s.day = today; s.n = 0; }
+        if (s.n >= 2 || !window.SysAuth || !SysAuth.loggedIn()) return false;
+        const fim = new Date(); fim.setDate(fim.getDate() + 3);
+        const out = await callOpenRouter([
+            { role: 'system', content: buildArquitetoSystemPrompt(true) },
+            { role: 'user', content: '[EVENTO AUTOMÁTICO] Lance AGORA uma MISSÃO ESPECIAL para o caçador: tipo criar_missao, frequencia "unica", especial true, dataInicial ' + today + ', dataFinal ' + localDateKey(fim) + ' (prazo de 3 dias), com itemRecompensa. Deve ser desafiadora e realizável em 3 dias, ligada ao que os dados dele mostram (falhas, atributos baixos). Escreva UMA frase curta no tom do Arquiteto e o bloco acao completo.' }
+        ], 1200);
+        const r = extractArqActions(out);
+        if (!r.actions.length) return false;
+        r.actions[0].especial = true;
+        s.n++; s.especialAt = Date.now(); writeState(s);
+        const txt = r.text.replace(/^\s*(?:\*\*)?Arquiteto(?:\*\*)?\s*[:\-—]\s*/i, '');
+        arquitetoChatHistory.push({ role: 'assistant', content: txt || 'Um desafio especial foi lançado.', actions: r.actions, timestamp: Date.now(), auto: true });
+        saveArquitetoHistory(); renderArquitetoMessages();
+        g.addNotification('DESAFIO ESPECIAL DO ARQUITETO', 'Há uma missão especial esperando sua resposta no chat do Arquiteto. Prazo: 3 dias.', 'architect');
+        return true;
+    }
+    window.arquitetoProporEspecial = proposeSpecial;
     window.arquitetoAutoCheck = autoCheck;
 
     document.addEventListener('DOMContentLoaded', function () {

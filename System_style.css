@@ -11217,3 +11217,63 @@ body.sys-app { padding-bottom: env(safe-area-inset-bottom, 0px); padding-top: en
 .vid-mission-ia { margin: 6px 0 2px; font-size: .72rem; line-height: 1.45; font-style: italic; color: rgba(200,190,255,.8); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .vid-mission-ia b { font-style: normal; font-size: .62rem; letter-spacing: .12em; color: #a99bff; margin-right: 4px; }
 .mf2-int[hidden], #mf2EndWrap[hidden], #mf2CheckBox[hidden], #mf2Err[hidden] { display: none !important; }
+
+/* ===== Loja do Tempo (cards + janela de compra) ===== */
+.lj-wrap { display: block !important; padding: 0 2px 16px; }
+.lj-sec { margin: 16px 2px 8px; font: 700 .72rem var(--sl-font-display); letter-spacing: .16em; color: rgba(255,255,255,.55); }
+.lj-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.lj-card { display: flex; flex-direction: column; gap: 6px; text-align: left; padding: 14px 12px 12px; border-radius: 14px; border: 1px solid rgba(0,229,255,.28); background: linear-gradient(160deg, rgba(10,30,60,.65), rgba(6,10,22,.85)); color: inherit; cursor: pointer; }
+.lj-card:active { transform: scale(.98); }
+.lj-card--poor { border-color: rgba(255,255,255,.12); }
+.lj-card--poor .lj-price { color: rgba(255,255,255,.4); }
+.lj-card-ico { font-size: 2.1rem; line-height: 1; }
+.lj-card-name { font: 700 .82rem var(--sl-font-display); letter-spacing: .04em; color: #fff; }
+.lj-card-desc { font-size: .7rem; line-height: 1.4; color: rgba(255,255,255,.6); flex: 1; }
+.lj-card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+.lj-time { font-size: .62rem; padding: 3px 8px; border-radius: 999px; background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); }
+.lj-price { font: 700 .82rem var(--sl-font-display); color: #7dffb3; }
+.lj-invlink { margin-top: 8px; }
+.lj-overlay { position: fixed; inset: 0; z-index: 12000; display: flex; align-items: flex-end; justify-content: center; background: rgba(0,0,0,.72); backdrop-filter: blur(4px); }
+.lj-sheet { position: relative; width: min(440px, 100%); box-sizing: border-box; padding: 24px 20px calc(20px + env(safe-area-inset-bottom, 0px)); border-radius: 24px 24px 0 0; background: linear-gradient(180deg, #0c1a33, #070b17); border: 1px solid rgba(0,229,255,.35); border-bottom: 0; box-shadow: 0 -10px 50px rgba(0,160,255,.2); text-align: center; animation: lj-up .25s ease-out; max-height: 92vh; overflow-y: auto; }
+@keyframes lj-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.lj-x { position: absolute; top: 10px; right: 12px; width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(255,255,255,.08); color: #fff; font-size: 1.4rem; cursor: pointer; }
+.lj-hero { display: grid; place-items: center; margin: 2px 0 10px; }
+.lj-ico { width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; font-size: 3rem; background: radial-gradient(circle at 35% 30%, rgba(0,229,255,.35), rgba(0,60,120,.2) 70%); border: 2px solid rgba(0,229,255,.7); box-shadow: 0 0 30px rgba(0,229,255,.45); }
+.lj-name { margin: 0; font: 700 1.1rem var(--sl-font-display); letter-spacing: .06em; color: #fff; }
+.lj-desc { margin: 8px 0 12px; font-size: .8rem; line-height: 1.5; color: rgba(255,255,255,.7); }
+.lj-badges { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.lj-badges span { font-size: .68rem; padding: 5px 10px; border-radius: 999px; background: rgba(0,229,255,.1); border: 1px solid rgba(0,229,255,.3); color: #bff6ff; }
+.lj-buyrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.lj-unit { text-align: left; } .lj-unit small { display: block; font-size: .6rem; letter-spacing: .14em; color: rgba(255,255,255,.5); } .lj-unit b { font: 700 1.05rem var(--sl-font-display); color: #7dffb3; }
+.lj-qty { display: flex; align-items: center; gap: 6px; }
+.lj-qty button { width: 46px; height: 46px; border-radius: 12px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.07); color: #fff; font-size: 1.4rem; cursor: pointer; }
+.lj-qty input { width: 58px; height: 46px; text-align: center; font: 700 1.1rem var(--sl-font-display); color: #fff; background: rgba(0,0,0,.35); border: 1px solid rgba(0,229,255,.4); border-radius: 12px; }
+.lj-sum { display: grid; gap: 6px; padding: 12px; margin-bottom: 14px; border-radius: 12px; background: rgba(255,255,255,.04); }
+.lj-sum > div { display: flex; justify-content: space-between; font-size: .78rem; color: rgba(255,255,255,.65); }
+.lj-sum b { color: #fff; } .lj-sum b.lj-neg { color: #ff7b8a; }
+.lj-buy { width: 100%; padding: 15px; border: 0; border-radius: 14px; font: 700 .9rem var(--sl-font-display); letter-spacing: .08em; color: #04101f; background: linear-gradient(90deg, #5ee7ff, #7dffb3); cursor: pointer; }
+.lj-buy:disabled { color: rgba(255,255,255,.5); background: rgba(255,255,255,.1); }
+.lj-ghost { width: 100%; padding: 13px; margin-top: 8px; border-radius: 14px; border: 1px solid rgba(255,255,255,.2); background: transparent; color: rgba(255,255,255,.75); font-size: .85rem; cursor: pointer; }
+.lj-ok { padding: 10px 0 4px; } .lj-ok-ico { width: 84px; height: 84px; margin: 0 auto 12px; border-radius: 50%; display: grid; place-items: center; font-size: 2.6rem; color: #04101f; background: linear-gradient(135deg, #5ee7ff, #7dffb3); box-shadow: 0 0 34px rgba(125,255,179,.5); }
+.lj-actions { margin-top: 14px; }
+/* ===== Itens de Recompensa = inventário ===== */
+.it2-total { position: relative; margin: 6px 0 12px; padding: 18px 16px; border-radius: 16px; border: 1px solid rgba(245,158,11,.4); background: linear-gradient(160deg, rgba(60,40,6,.5), rgba(10,10,20,.8)); display: flex; align-items: center; justify-content: center; }
+.it2-num { font: 700 2.6rem Rajdhani, Inter, sans-serif; line-height: 1; color: #fff; text-align: center; }
+.it2-lbl { margin-top: 4px; font: 600 .62rem var(--sl-font-display); letter-spacing: .16em; color: rgba(255,214,140,.8); text-align: center; }
+.it2-info { position: absolute; top: 10px; right: 10px; width: 24px; height: 24px; min-height: 0 !important; padding: 0; border-radius: 50%; border: 1.5px solid rgba(255,214,140,.8); background: transparent; color: rgba(255,214,140,.95); font: 700 .8rem Inter, sans-serif; line-height: 1; cursor: pointer; }
+.it2-infopanel { margin-bottom: 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(245,158,11,.3); background: rgba(40,28,6,.6); }
+.it2-infopanel[hidden], .it2-info[hidden] { display: none; }
+.it2-infotitle { font: 700 .72rem var(--sl-font-display); letter-spacing: .08em; color: #ffd68c; margin-bottom: 6px; }
+.it2-infolist { margin: 0; padding-left: 18px; font-size: .74rem; line-height: 1.55; color: rgba(255,255,255,.75); }
+.it2-shield { margin-bottom: 10px; padding: 8px 12px; border-radius: 10px; font-size: .74rem; color: #bff6ff; background: rgba(0,229,255,.1); border: 1px solid rgba(0,229,255,.3); }
+.it2-grid { display: grid; gap: 10px; padding-bottom: 20px; }
+.it2-card { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04); }
+.it2-ico { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; font-size: 1.7rem; background: rgba(255,255,255,.07); flex-shrink: 0; }
+.it2-body { flex: 1; min-width: 0; } .it2-name { font: 700 .82rem var(--sl-font-display); color: #fff; } .it2-name b { color: #ffd68c; }
+.it2-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; font-size: .64rem; color: rgba(255,255,255,.55); align-items: center; }
+.it2-chip { padding: 2px 7px; border-radius: 999px; font-size: .58rem; letter-spacing: .08em; background: rgba(255,255,255,.08); }
+.it2-chip--arquiteto { color: #c9bbff; background: rgba(140,100,255,.2); } .it2-chip--loja { color: #7dffb3; background: rgba(125,255,179,.12); }
+.it2-use { min-height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid rgba(0,229,255,.6); background: rgba(0,229,255,.12); color: #bff6ff; font: 700 .7rem var(--sl-font-display); letter-spacing: .1em; cursor: pointer; }
+.it2-empty { padding: 36px 16px; text-align: center; font-size: .82rem; line-height: 1.6; color: rgba(255,255,255,.55); }
+#vidShopBalance { font-family: Rajdhani, Inter, sans-serif; font-weight: 700; font-size: 1.5rem; }
+.vid-shop-history, .lj-invlink { display: inline-flex; align-items: center; margin: 8px 8px 0 0; padding: 10px 16px; min-height: 40px; border-radius: 999px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.05); color: rgba(255,255,255,.85); font-size: .78rem; cursor: pointer; }

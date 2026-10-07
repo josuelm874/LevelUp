@@ -1104,40 +1104,22 @@
                     </span>
                     <div>
                         <h1 class="vd-page-title" style="color:#f59e0b">Itens de Recompensa</h1>
-                        <p class="vd-page-sub">Complete missões especiais para conquistar itens raros!</p>
+                        <p class="vd-page-sub">Os itens que você comprou e conquistou</p>
                     </div>
                 </div>
             </div>
 
-            <!-- KPI row -->
-            <div class="vd-kpi-row" id="itensKpiRow"></div>
-
-            <!-- Info box -->
-            <div class="vd-info-box vd-info-box--yellow">
-                <div class="vd-info-box-title">
-                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" style="width:14px;height:14px"><path d="M8 1.5l2 5h5l-4 3 1.5 5L8 11.5l-4.5 3L5 9.5l-4-3h5z"/></svg>
-                    Como Desbloquear Itens
-                </div>
-                <ul class="vd-info-list">
-                    <li><strong>Missões Especiais do Arquiteto:</strong> De tempos em tempos, o Arquiteto IA irá te desafiar com missões únicas.</li>
-                    <li><strong>Recompensas Exclusivas:</strong> Cada missão especial completada garante um item raro para sua coleção permanentemente.</li>
-                    <li><strong>Tempo Limitado:</strong> Missões especiais têm um prazo! Aceita e completa dentro do tempo para conquistar o item.</li>
-                    <li><strong>Raridade:</strong> Quanto mais raro o item, mais desafiadora será a missão e maiores as recompensas de XP e Coins!</li>
+            <div class="it2-total" id="itensTotalBox"></div>
+            <div id="itensShield"></div>
+            <div class="it2-infopanel" id="itensInfoPanel" hidden>
+                <div class="it2-infotitle">Como desbloquear itens</div>
+                <ul class="it2-infolist">
+                    <li><strong>Loja do Tempo:</strong> compre itens e poções com as moedas que você ganha nas missões.</li>
+                    <li><strong>Missões especiais do Arquiteto:</strong> de tempos em tempos ele lança um desafio com prazo curto. Conclua dentro do tempo para ganhar um item.</li>
+                    <li><strong>Sem raridades:</strong> todo item vale o que você decidir aproveitar. Use quando quiser, no botão USAR.</li>
                 </ul>
-                <div class="vd-info-alert">
-                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" style="width:13px;height:13px;flex-shrink:0"><path d="M8 1.5L1 13.5h14L8 1.5z"/><line x1="8" y1="6" x2="8" y2="9"/><circle cx="8" cy="11.5" r="0.5" fill="currentColor"/></svg>
-                    <span><strong>Dica:</strong> Fique atento às notificações! Quando uma missão especial aparecer no seu Painel ou na aba Missões, você terá tempo limitado para aceitá-la e completá-la.</span>
-                </div>
             </div>
-
-            <!-- Rarity filter tabs -->
-            <div class="vd-rarity-tabs" id="itensRarityTabs"></div>
-
-            <!-- Items grid -->
-            <div class="vd-items-grid" id="itensGrid"></div>
-
-            <!-- Add custom item -->
-            <button type="button" class="vd-add-btn" id="addItemBtn">+ Adicionar Item Personalizado</button>
+            <div class="it2-grid" id="itensGrid"></div>
         </div>
 
 
@@ -1445,6 +1427,7 @@
 <script src="System_extras.js"></script>
 <script src="System_arquiteto.js"></script>
 <script src="System_missoes.js"></script>
+<script src="System_loja.js"></script>
 <script src="System_mobile.js"></script>
 <script src="System_login.js"></script>
 </body>
