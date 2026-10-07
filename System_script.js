@@ -9849,68 +9849,63 @@ const ARVORE_ATTRS = {
     disciplina: { label: 'Disciplina', cor: '#818cf8', rgb: '129,140,248' },
 };
 
+// Cada atributo: [t1, t2a, t2b, t3a, t3b] = [nome, ícone, nível, frase, virtude]. t2a/t2b saem de t1; t3a de t2a; t3b de t2b.
+const ARVORE_DEF = {
+    forca: [
+        ['Corpo de Ferro', '💪', 10, 'O corpo é o templo da mente. Forje-o com disciplina e dedicação.', 'Nenhuma virtude desbloqueada ainda. Continue evoluindo!'],
+        ['Punho Inabalável', '👊', 20, 'Cada repetição é uma promessa cumprida com o próprio corpo.', 'Força de vontade física: você aguenta o treino até o fim.'],
+        ['Músculo de Aço', '🏋️', 25, 'O peso não diminui; você é que cresce.', 'Carga progressiva: cada semana um pouco mais forte.'],
+        ['Golpe Demolidor', '💥', 40, 'Toda barreira tem um ponto fraco. Treino é achá-lo.', 'Explosão e potência: o esforço máximo vira rotina.'],
+        ['Colosso', '🛡️', 50, 'Não há muralha que a constância não derrube.', 'Domínio total do corpo: o limite de hoje é o aquecimento de amanhã.']
+    ],
+    vitalidade: [
+        ['Energia Vital', '❤️', 10, 'Cuide do seu corpo como se sua vida dependesse disso — porque depende.', 'Nenhuma virtude desbloqueada ainda. Continue evoluindo!'],
+        ['Fôlego Infinito', '🌬️', 20, 'Quem respira com calma não perde a batalha para o cansaço.', 'Resistência: o cansaço chega mais tarde.'],
+        ['Sono Reparador', '😴', 25, 'Descansar também é treinar.', 'Recuperação acelerada: sono, água e descanso viram vantagem.'],
+        ['Coração de Titã', '🫀', 40, 'Um coração forte sustenta qualquer jornada.', 'Energia que não se esgota: sua base aguenta o peso do Sistema.'],
+        ['Corpo Regenerante', '🧬', 50, 'O que não te quebra, te reconstrói melhor.', 'Regeneração: você volta de qualquer queda mais rápido.']
+    ],
+    foco: [
+        ['Mente Afiada', '🎯', 10, 'Onde a atenção vai, a energia flui. Dominar o foco é dominar o tempo.', 'Nenhuma virtude desbloqueada ainda. Continue evoluindo!'],
+        ['Olhar de Águia', '🦅', 20, 'Veja o essencial e ignore o ruído.', 'Atenção seletiva: você escolhe no que gastar sua mente.'],
+        ['Silêncio Interior', '🧘', 25, 'A calma é onde as boas decisões nascem.', 'Mente quieta: menos distração, mais entrega.'],
+        ['Clareza Total', '💠', 40, 'Quando a mente silencia, o caminho aparece.', 'Concentração profunda: horas de trabalho sem se perder.'],
+        ['Mente Absoluta', '👁️', 50, 'Quem domina a atenção domina o dia.', 'Foco inabalável: nada te tira do que importa.']
+    ],
+    carisma: [
+        ['Presença de Rei', '✨', 10, 'Sua presença deve falar mais alto do que suas palavras.', 'Nenhuma virtude desbloqueada ainda. Continue evoluindo!'],
+        ['Voz de Comando', '📣', 20, 'Falar com clareza é a primeira forma de liderar.', 'Comunicação firme: você pede, negocia e convence.'],
+        ['Palavra Certeira', '💬', 25, 'Poucas palavras, no momento certo.', 'Argumento afiado: você diz o que precisa ser dito.'],
+        ['Aura Soberana', '👑', 40, 'Respeito não se exige; se conquista em silêncio.', 'Influência natural: as pessoas ao redor sobem junto com você.'],
+        ['Líder Nato', '🤝', 50, 'Liderar é fazer os outros acreditarem no caminho.', 'Liderança: você reúne pessoas em torno de um objetivo.']
+    ],
+    disciplina: [
+        ['Vontade Absoluta', '🔮', 10, 'A disciplina é a ponte entre metas e realizações.', 'Nenhuma virtude desbloqueada ainda. Continue evoluindo!'],
+        ['Rotina de Aço', '⚙️', 20, 'O hábito faz sozinho o que a motivação esqueceu.', 'Consistência automática: o dia começa e a rotina já está de pé.'],
+        ['Chama Constante', '🔥', 25, 'Motivação acende; disciplina mantém acesa.', 'Constância: você continua mesmo sem vontade.'],
+        ['Mestre de Si', '♾️', 40, 'Vencer a si mesmo é a única vitória que não passa.', 'Autocontrole completo: você cumpre o que decidiu, sem negociar.'],
+        ['Alma Inquebrável', '🗿', 50, 'O que é feito de propósito não se desfaz.', 'Resiliência total: nenhum revés muda a direção.']
+    ]
+};
+
 const ARVORE_TREE_NODES = [
     { id:'despertar',    nome:'O DESPERTAR',          icon:'⚡', nivel:0,  fase:1, reqNivel:0,  atributo:null, tier:'root',
       quote:'O despertar é apenas o começo. Abra os olhos para o que realmente importa.',
       virtudes:'Nenhuma virtude desbloqueada ainda. Continue evoluindo para o nível 10!' },
     { id:'desconhecido', nome:'CAMINHO DESCONHECIDO',  icon:'◈', nivel:5,  fase:1, reqNivel:5,  atributo:null, tier:'hub',
       quote:'O caminho à frente está envolto em sombras. Continue evoluindo para revelar seu destino.',
-      virtudes:'Este caminho ainda está oculto. Alcance o nível 5 para revelar o próximo passo.' },
-    { id:'forca_1',      nome:'Corpo de Ferro',        icon:'💪', nivel:10, fase:2, reqNivel:10, atributo:'forca', tier:1,
-      quote:'O corpo é o templo da mente. Forje-o com disciplina e dedicação.',
-      virtudes:'Nenhuma virtude desbloqueada ainda. Continue evoluindo!' },
-    { id:'forca_2',      nome:'Punho Inabalável',      icon:'👊', nivel:25, fase:3, reqNivel:25, atributo:'forca', tier:2,
-      quote:'Cada repetição é uma promessa cumprida com o próprio corpo.',
-      virtudes:'Força de vontade física: você aguenta o treino até o fim.' },
-    { id:'forca_3',      nome:'Colosso',               icon:'🛡️', nivel:50, fase:4, reqNivel:50, atributo:'forca', tier:3,
-      quote:'Não há muralha que a constância não derrube.',
-      virtudes:'Domínio total do corpo: o limite de hoje é o aquecimento de amanhã.' },
-    { id:'vitalidade_1', nome:'Energia Vital',         icon:'❤️', nivel:10, fase:2, reqNivel:10, atributo:'vitalidade', tier:1,
-      quote:'Cuide do seu corpo como se sua vida dependesse disso — porque depende.',
-      virtudes:'Nenhuma virtude desbloqueada ainda. Continue evoluindo!' },
-    { id:'vitalidade_2', nome:'Fôlego Infinito',       icon:'🌬️', nivel:25, fase:3, reqNivel:25, atributo:'vitalidade', tier:2,
-      quote:'Quem respira com calma não perde a batalha para o cansaço.',
-      virtudes:'Recuperação acelerada: sono, água e descanso viram vantagem.' },
-    { id:'vitalidade_3', nome:'Coração de Titã',       icon:'🫀', nivel:50, fase:4, reqNivel:50, atributo:'vitalidade', tier:3,
-      quote:'Um coração forte sustenta qualquer jornada.',
-      virtudes:'Energia que não se esgota: sua base física aguenta o peso do Sistema.' },
-    { id:'foco_1',       nome:'Mente Afiada',          icon:'🎯', nivel:10, fase:2, reqNivel:10, atributo:'foco', tier:1,
-      quote:'Onde a atenção vai, a energia flui. Dominar o foco é dominar o tempo.',
-      virtudes:'Nenhuma virtude desbloqueada ainda. Continue evoluindo!' },
-    { id:'foco_2',       nome:'Olhar de Águia',        icon:'🦅', nivel:25, fase:3, reqNivel:25, atributo:'foco', tier:2,
-      quote:'Veja o essencial e ignore o ruído.',
-      virtudes:'Atenção seletiva: você escolhe no que gastar sua mente.' },
-    { id:'foco_3',       nome:'Clareza Total',         icon:'💠', nivel:50, fase:4, reqNivel:50, atributo:'foco', tier:3,
-      quote:'Quando a mente silencia, o caminho aparece.',
-      virtudes:'Concentração profunda: horas de trabalho sem se perder.' },
-    { id:'carisma_1',    nome:'Presença de Rei',       icon:'✨', nivel:10, fase:2, reqNivel:10, atributo:'carisma', tier:1,
-      quote:'Sua presença deve falar mais alto do que suas palavras.',
-      virtudes:'Nenhuma virtude desbloqueada ainda. Continue evoluindo!' },
-    { id:'carisma_2',    nome:'Voz de Comando',        icon:'📣', nivel:25, fase:3, reqNivel:25, atributo:'carisma', tier:2,
-      quote:'Falar com clareza é a primeira forma de liderar.',
-      virtudes:'Comunicação firme: você pede, negocia e convence.' },
-    { id:'carisma_3',    nome:'Aura Soberana',         icon:'👑', nivel:50, fase:4, reqNivel:50, atributo:'carisma', tier:3,
-      quote:'Respeito não se exige; se conquista em silêncio.',
-      virtudes:'Influência natural: as pessoas ao redor sobem junto com você.' },
-    { id:'disciplina_1', nome:'Vontade Absoluta',      icon:'🔮', nivel:10, fase:2, reqNivel:10, atributo:'disciplina', tier:1,
-      quote:'A disciplina é a ponte entre metas e realizações.',
-      virtudes:'Nenhuma virtude desbloqueada ainda. Continue evoluindo!' },
-    { id:'disciplina_2', nome:'Rotina de Aço',         icon:'⚙️', nivel:25, fase:3, reqNivel:25, atributo:'disciplina', tier:2,
-      quote:'O hábito faz sozinho o que a motivação esqueceu.',
-      virtudes:'Consistência automática: o dia começa e a rotina já está de pé.' },
-    { id:'disciplina_3', nome:'Mestre de Si',          icon:'♾️', nivel:50, fase:4, reqNivel:50, atributo:'disciplina', tier:3,
-      quote:'Vencer a si mesmo é a única vitória que não passa.',
-      virtudes:'Autocontrole completo: você cumpre o que decidiu, sem negociar.' },
+      virtudes:'Este caminho ainda está oculto. Alcance o nível 5 para revelar o próximo passo.' }
 ];
-
-const ARVORE_CONNECTIONS = [
-    ['despertar', 'desconhecido'],
-    ['desconhecido', 'forca_1'], ['forca_1', 'forca_2'], ['forca_2', 'forca_3'],
-    ['desconhecido', 'vitalidade_1'], ['vitalidade_1', 'vitalidade_2'], ['vitalidade_2', 'vitalidade_3'],
-    ['desconhecido', 'foco_1'], ['foco_1', 'foco_2'], ['foco_2', 'foco_3'],
-    ['desconhecido', 'carisma_1'], ['carisma_1', 'carisma_2'], ['carisma_2', 'carisma_3'],
-    ['desconhecido', 'disciplina_1'], ['disciplina_1', 'disciplina_2'], ['disciplina_2', 'disciplina_3'],
-];
+const ARVORE_CONNECTIONS = [['despertar', 'desconhecido']];
+Object.keys(ARVORE_DEF).forEach(function(attr) {
+    const SLOTS = [['1', 1, 0, 'desconhecido'], ['2a', 2, -1, attr + '_1'], ['2b', 2, 1, attr + '_1'], ['3a', 3, -1, attr + '_2a'], ['3b', 3, 1, attr + '_2b']];
+    ARVORE_DEF[attr].forEach(function(d, i) {
+        const s = SLOTS[i];
+        ARVORE_TREE_NODES.push({ id: attr + '_' + s[0], nome: d[0], icon: d[1], nivel: d[2], fase: s[1] + 1, reqNivel: d[2],
+            atributo: attr, tier: s[1], side: s[2], quote: d[3], virtudes: d[4] });
+        ARVORE_CONNECTIONS.push([s[3], attr + '_' + s[0]]);
+    });
+});
 
 // ---- ARQUITETO PERSONAGEM FRAGMENTS ----
 const AP_FRAGMENTS = [
@@ -11174,6 +11169,7 @@ function initArvoreEvolucao() {
     _arvoreSel = null;
     renderArvoreFilter();
     renderArvoreTree();
+    arvoreInitMap();
     if (!window._arvoreResizeSet) {
         window._arvoreResizeSet = true;
         window.addEventListener('resize', function() {
@@ -11205,78 +11201,80 @@ function filterArvoreAttr(key) {
     renderArvoreTree();
 }
 
-// Leque radial: o Caminho Desconhecido é o centro; cada atributo sai em um ângulo, com 3 camadas (arcos).
-const ARVORE_ANGLES = { forca: -68, vitalidade: -34, foco: 0, carisma: 34, disciplina: 68 };
-const ARVORE_RADII = { 1: 110, 2: 188, 3: 266 };
+// Mapa em leque: Caminho Desconhecido no centro; cada atributo sai em um ângulo. O mapa é maior que a tela (arrastar/zoom).
+const ARVORE_ANGLES = { forca: -76, vitalidade: -38, foco: 0, carisma: 38, disciplina: 76 };
+const ARVORE_RADII = { 1: 150, 2: 290, 3: 430 };
+const ARVORE_SIDE_DEG = 11;
+const ARVORE_MAP = { w: 1500, h: 960, hubX: 750, hubY: 690, rootY: 830 };
 let _arvoreSel = null;
+const _arvView = { x: 0, y: 0, s: 0.9, bound: false };
+
+function _arvPolar(r, deg) {
+    const a = deg * Math.PI / 180;
+    return { x: ARVORE_MAP.hubX + r * Math.sin(a), y: ARVORE_MAP.hubY - r * Math.cos(a) };
+}
 
 function renderArvoreTree() {
-    const canvas   = document.getElementById('arvoreTreeCanvas');
     const nodesDiv = document.getElementById('arvoreTreeNodes');
     const svg      = document.getElementById('arvoreTreeSvg');
-    if (!canvas || !nodesDiv || !svg) return;
+    if (!nodesDiv || !svg) return;
 
     const nivel = gameSystem.data.nivel || 0;
     const seen  = gameSystem.data.arvoreDesbloqueados || [];
-    const sec   = document.getElementById('arvoreEvolucaoSection');
-    const W = Math.max(260, canvas.clientWidth || (sec && sec.clientWidth) || 360);
-    const H = 520, hubY = H - 150, cx = W / 2;
-    const rad = Math.PI / 180;
-    const kx = Math.min(1, (W / 2 - 38) / (ARVORE_RADII[3] * Math.sin(68 * rad)));
-    const SZ = W < 360 ? 34 : 38;
-
-    canvas.style.height = H + 'px';
-    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-    svg.setAttribute('width', W);
-    svg.setAttribute('height', H);
+    const M = ARVORE_MAP;
+    svg.setAttribute('viewBox', '0 0 ' + M.w + ' ' + M.h);
+    svg.setAttribute('width', M.w);
+    svg.setAttribute('height', M.h);
 
     const pos = {};
     ARVORE_TREE_NODES.forEach(function(n) {
-        let x = cx, y, size = SZ;
-        if (n.tier === 'root') { y = H - 62; size = 54; }
-        else if (n.tier === 'hub') { y = hubY; size = 44; }
+        let p, r = 0, deg = 0, size = 58;
+        if (n.tier === 'root') { p = { x: M.hubX, y: M.rootY }; size = 88; }
+        else if (n.tier === 'hub') { p = { x: M.hubX, y: M.hubY }; size = 66; }
         else {
-            const a = ARVORE_ANGLES[n.atributo] * rad, r = ARVORE_RADII[n.tier];
-            x = cx + r * Math.sin(a) * kx;
-            y = hubY - r * Math.cos(a);
+            r = ARVORE_RADII[n.tier];
+            deg = ARVORE_ANGLES[n.atributo] + n.side * ARVORE_SIDE_DEG;
+            p = _arvPolar(r, deg);
         }
         const at = n.atributo ? ARVORE_ATTRS[n.atributo] : null;
         pos[n.id] = {
-            n: n, x: x, y: y, size: size,
+            n: n, x: p.x, y: p.y, r: r, deg: deg, size: size,
             unlocked: nivel >= n.reqNivel,
             cor: at ? at.cor : '#7fe3ff', rgb: at ? at.rgb : '127,227,255',
             on: !_arvoreActiveAttr || n.atributo === _arvoreActiveAttr || !n.atributo
         };
     });
 
-    // fundo: arcos concêntricos e raios finos
+    // fundo: arcos finos interrompidos, raios e pontos nas intersecções
     let bg = '';
-    [ARVORE_RADII[1], ARVORE_RADII[2], ARVORE_RADII[3], ARVORE_RADII[3] + 46].forEach(function(r, i) {
-        const rx = r * kx;
-        bg += '<path d="M' + (cx - rx) + ' ' + hubY + ' A' + rx + ' ' + r + ' 0 0 1 ' + (cx + rx) + ' ' + hubY + '" fill="none" '
-            + 'stroke="rgba(150,200,255,' + (i === 3 ? 0.10 : 0.16) + ')" stroke-width="1"' + (i === 3 ? ' stroke-dasharray="3 6"' : '') + '/>';
+    [150, 290, 430, 530, 640].forEach(function(r, i) {
+        const a = _arvPolar(r, -96), b = _arvPolar(r, 96);
+        const dash = i < 3 ? (r * 0.7) + ' 10 ' + (r * 0.25) + ' 18' : (r * 0.5) + ' 6 ' + (r * 0.15) + ' 30';
+        bg += '<path d="M' + a.x + ' ' + a.y + ' A' + r + ' ' + r + ' 0 0 1 ' + b.x + ' ' + b.y + '" fill="none" stroke="rgba(200,225,255,' + (i < 3 ? 0.22 : 0.15) + ')" stroke-width="1.2" stroke-dasharray="' + dash + '"/>';
     });
     Object.keys(ARVORE_ANGLES).forEach(function(k) {
-        const a = ARVORE_ANGLES[k] * rad;
-        bg += '<line x1="' + cx + '" y1="' + hubY + '" x2="' + (cx + (ARVORE_RADII[3] + 46) * Math.sin(a) * kx) + '" y2="' + (hubY - (ARVORE_RADII[3] + 46) * Math.cos(a)) + '" stroke="rgba(150,200,255,0.07)"/>';
+        const e = _arvPolar(640, ARVORE_ANGLES[k]);
+        bg += '<line x1="' + M.hubX + '" y1="' + M.hubY + '" x2="' + e.x + '" y2="' + e.y + '" stroke="rgba(200,225,255,0.07)"/>';
+        [530, 640].forEach(function(r) { const d = _arvPolar(r, ARVORE_ANGLES[k]); bg += '<circle cx="' + d.x + '" cy="' + d.y + '" r="4" fill="rgba(210,230,255,0.55)"/>'; });
     });
 
-    // ligações: acendem até o último nó desbloqueado
+    // ligações em curva; acendem até o último nó desbloqueado
     let lines = '';
     ARVORE_CONNECTIONS.forEach(function(pair) {
         const a = pos[pair[0]], b = pos[pair[1]];
-        if (!a || !b) return;
         const lit = b.unlocked && a.on && b.on;
-        const col = b.n.atributo ? b.cor : '#7fe3ff';
-        const d = a.n.tier === 'hub'
-            ? 'M' + a.x + ' ' + a.y + ' Q' + a.x + ' ' + b.y + ' ' + b.x + ' ' + b.y
-            : 'M' + a.x + ' ' + a.y + ' L' + b.x + ' ' + b.y;
-        if (lit) lines += '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-opacity="0.35" stroke-width="7" stroke-linecap="round"/>';
-        lines += '<path d="' + d + '" fill="none" stroke="' + (lit ? '#eaffff' : 'rgba(150,200,255,0.18)') + '" stroke-width="' + (lit ? 2 : 1.2) + '" stroke-linecap="round"' + (lit ? '' : ' stroke-dasharray="2 5"') + '/>';
+        let d;
+        if (a.n.tier === 'root') d = 'M' + a.x + ' ' + a.y + ' L' + b.x + ' ' + b.y;
+        else {
+            const c = a.n.tier === 'hub' ? _arvPolar((b.r) * 0.55, 0) : _arvPolar(a.r + (b.r - a.r) * 0.55, a.deg);
+            d = 'M' + a.x + ' ' + a.y + ' Q' + c.x + ' ' + c.y + ' ' + b.x + ' ' + b.y;
+        }
+        if (lit) lines += '<path d="' + d + '" fill="none" stroke="' + b.cor + '" stroke-opacity="0.3" stroke-width="12" stroke-linecap="round"/>';
+        lines += '<path d="' + d + '" fill="none" stroke="' + (lit ? '#f4fbff' : 'rgba(190,215,255,0.2)') + '" stroke-width="' + (lit ? 3.2 : 1.6) + '" stroke-linecap="round"/>';
     });
     svg.innerHTML = bg + lines;
 
-    const lockSvg = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:46%;height:46%"><rect x="5" y="9" width="10" height="9" rx="1.4"/><path d="M7.5 9V6.6a2.5 2.5 0 0 1 5 0V9"/></svg>';
+    const lockSvg = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:44%;height:44%"><rect x="5" y="9" width="10" height="9" rx="1.4"/><path d="M7.5 9V6.6a2.5 2.5 0 0 1 5 0V9"/></svg>';
     let html = '';
     ARVORE_TREE_NODES.forEach(function(n) {
         const p = pos[n.id];
@@ -11285,35 +11283,40 @@ function renderArvoreTree() {
         if (!p.on) cls += ' ar-n--dim';
         if (_arvoreSel === n.id) cls += ' ar-n--sel';
         if (p.unlocked && seen.indexOf(n.id) < 0) cls += ' ar-n--new';
-        html += '<div class="' + cls + '" role="button" tabindex="0" aria-label="' + _escapeHtml(p.unlocked || n.tier === 1 || typeof n.tier === 'string' ? n.nome : 'Nó bloqueado') + '" '
-            + 'style="left:' + (p.x - p.size / 2) + 'px;top:' + (p.y - p.size / 2) + 'px;width:' + p.size + 'px;height:' + p.size + 'px;--s:' + p.size + 'px;--c:' + p.cor + ';--rgb:' + p.rgb + '" '
-            + 'onclick="selectArvoreNode(\'' + n.id + '\')">'
+        html += '<div class="' + cls + '" data-id="' + n.id + '" '
+            + 'style="left:' + (p.x - p.size / 2) + 'px;top:' + (p.y - p.size / 2) + 'px;width:' + p.size + 'px;height:' + p.size + 'px;--s:' + p.size + 'px;--c:' + p.cor + ';--rgb:' + p.rgb + '">'
             + (p.unlocked ? '<span class="ar-n-ico">' + n.icon + '</span>' : lockSvg) + '</div>';
     });
-    html += '<div class="ar-cap" style="left:' + cx + 'px;top:' + (H - 62 + 33) + 'px">O INÍCIO</div>';
+    html += '<div class="ar-cap" style="left:' + M.hubX + 'px;top:' + (M.rootY + 52) + 'px">O INÍCIO</div>';
     Object.keys(ARVORE_ANGLES).forEach(function(k) {
-        const p = pos[k + '_3'];
-        html += '<div class="ar-bl" style="left:' + p.x + 'px;top:' + (p.y - p.size / 2 - 16) + 'px;--c:' + p.cor + '">' + ARVORE_ATTRS[k].label.toUpperCase() + '</div>';
+        const e = _arvPolar(ARVORE_RADII[3] + 110, ARVORE_ANGLES[k]);
+        html += '<div class="ar-bl" style="left:' + e.x + 'px;top:' + e.y + 'px;--c:' + ARVORE_ATTRS[k].cor + '">' + ARVORE_ATTRS[k].label.toUpperCase() + '</div>';
     });
     nodesDiv.innerHTML = html;
 
     renderArvoreInfo();
     renderArvoreProgress(nivel);
+    arvoreApplyView();
 }
 
 function renderArvoreInfo() {
     const box = document.getElementById('arvoreInfo');
     if (!box) return;
     const n = ARVORE_TREE_NODES.find(function(x) { return x.id === _arvoreSel; });
-    if (!n) { box.innerHTML = '<div class="ar-info-hint">Toque em um nó da árvore para ver os detalhes.</div>'; return; }
+    if (!n) {
+        box.style.setProperty('--c', '#7fe3ff');
+        box.innerHTML = '<div class="ar-info-name">ÁRVORE DE EVOLUÇÃO</div><div class="ar-info-tag">ARRASTE PARA EXPLORAR O MAPA</div>'
+            + '<div class="ar-info-body">Toque em um nó para ver os detalhes. Use dois dedos para aproximar ou afastar.</div>';
+        return;
+    }
     const nivel = gameSystem.data.nivel || 0;
     const unlocked = nivel >= n.reqNivel;
     const hidden = !unlocked && typeof n.tier === 'number' && n.tier >= 2;
     const at = n.atributo ? ARVORE_ATTRS[n.atributo] : null;
     box.style.setProperty('--c', at ? at.cor : '#7fe3ff');
     box.innerHTML =
-        '<div class="ar-info-top"><span class="ar-info-name">' + _escapeHtml(hidden ? '???' : n.nome) + '</span>'
-        + '<span class="ar-info-tag">' + (unlocked ? 'DESBLOQUEADO' : 'NÍVEL ' + n.reqNivel + ' · FASE ' + n.fase) + '</span></div>'
+        '<div class="ar-info-name">' + _escapeHtml(hidden ? '???' : n.nome) + '</div>'
+        + '<div class="ar-info-tag">' + (unlocked ? 'DESBLOQUEADO' : 'NÍVEL ' + n.reqNivel + ' · FASE ' + n.fase) + '</div>'
         + '<div class="ar-info-body">' + _escapeHtml(unlocked ? n.virtudes : (hidden ? 'Alcance o nível ' + n.reqNivel + ' para revelar este poder.' : n.virtudes)) + '</div>'
         + (hidden ? '' : '<div class="ar-info-quote">“' + _escapeHtml(n.quote) + '”</div>');
 }
@@ -11325,7 +11328,8 @@ function renderArvoreProgress(nivel) {
     const next = marks.find(function(m) { return m > nivel; });
     const prev = marks.filter(function(m) { return m <= nivel; }).pop() || 0;
     const pct = next === undefined ? 100 : Math.round((nivel - prev) / (next - prev) * 100);
-    box.innerHTML = '<div class="ar-prog-lbl"><b>' + nivel + '</b> NÍVEL ATUAL' + (next === undefined ? ' · ÁRVORE COMPLETA' : ' · PRÓXIMO MARCO: NÍVEL ' + next) + '</div>'
+    box.innerHTML = '<div class="ar-prog-num">' + nivel + '</div>'
+        + '<div class="ar-prog-lbl">NÍVEL ATUAL' + (next === undefined ? ' · ÁRVORE COMPLETA' : ' · PRÓXIMO MARCO: NÍVEL ' + next) + '</div>'
         + '<div class="ar-prog-bar"><i style="width:' + pct + '%"></i></div>';
 }
 
@@ -11340,6 +11344,84 @@ function selectArvoreNode(nodeId) {
         gameSystem.saveData();
     }
     renderArvoreTree();
+}
+
+// ---- navegação do mapa: arrastar em qualquer direção, pinça/roda para zoom ----
+function arvoreApplyView() {
+    const vp = document.getElementById('arvoreTreeCanvas'), map = document.getElementById('arvoreMap');
+    if (!vp || !map) return;
+    const v = _arvView, vw = vp.clientWidth, vh = vp.clientHeight, m = 140;
+    const mw = ARVORE_MAP.w * v.s, mh = ARVORE_MAP.h * v.s;
+    v.x = mw + 2 * m <= vw ? (vw - mw) / 2 : Math.min(m, Math.max(vw - mw - m, v.x));
+    v.y = mh + 2 * m <= vh ? (vh - mh) / 2 : Math.min(m, Math.max(vh - mh - m, v.y));
+    map.style.transform = 'translate(' + v.x + 'px,' + v.y + 'px) scale(' + v.s + ')';
+}
+
+function arvoreCenterView() {
+    const vp = document.getElementById('arvoreTreeCanvas');
+    if (!vp) return;
+    const v = _arvView;
+    v.s = 0.8;
+    v.x = vp.clientWidth / 2 - ARVORE_MAP.hubX * v.s;
+    v.y = vp.clientHeight * 0.58 - ARVORE_MAP.hubY * v.s;
+    arvoreApplyView();
+}
+
+function arvoreZoomAt(px, py, ns) {
+    const v = _arvView;
+    ns = Math.max(0.45, Math.min(1.8, ns));
+    v.x = px - (px - v.x) * (ns / v.s);
+    v.y = py - (py - v.y) * (ns / v.s);
+    v.s = ns;
+    arvoreApplyView();
+}
+
+function arvoreInitMap() {
+    const vp = document.getElementById('arvoreTreeCanvas');
+    if (!vp) return;
+    if (!_arvView.bound) {
+        _arvView.bound = true;
+        const ptrs = new Map();
+        let tapNode = null, travel = 0, pinch = 0;
+        const rel = function(e) { const r = vp.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+        vp.addEventListener('pointerdown', function(e) {
+            vp.setPointerCapture(e.pointerId);
+            ptrs.set(e.pointerId, rel(e));
+            if (ptrs.size === 1) { travel = 0; tapNode = e.target.closest ? e.target.closest('.ar-n') : null; }
+            else { tapNode = null; const [a, b] = Array.from(ptrs.values()); pinch = Math.hypot(a.x - b.x, a.y - b.y); }
+        });
+        vp.addEventListener('pointermove', function(e) {
+            if (!ptrs.has(e.pointerId)) return;
+            const prev = ptrs.get(e.pointerId), cur = rel(e);
+            ptrs.set(e.pointerId, cur);
+            if (ptrs.size === 1) {
+                travel += Math.abs(cur.x - prev.x) + Math.abs(cur.y - prev.y);
+                _arvView.x += cur.x - prev.x; _arvView.y += cur.y - prev.y;
+                arvoreApplyView();
+            } else if (ptrs.size === 2) {
+                const [a, b] = Array.from(ptrs.values()), d = Math.hypot(a.x - b.x, a.y - b.y);
+                if (pinch > 0) arvoreZoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, _arvView.s * d / pinch);
+                pinch = d;
+            }
+        });
+        const end = function(e) {
+            if (!ptrs.has(e.pointerId)) return;
+            const wasSingle = ptrs.size === 1;
+            ptrs.delete(e.pointerId);
+            if (wasSingle && e.type === 'pointerup' && travel < 10 && tapNode) selectArvoreNode(tapNode.getAttribute('data-id'));
+            tapNode = null; pinch = 0;
+        };
+        vp.addEventListener('pointerup', end);
+        vp.addEventListener('pointercancel', end);
+        vp.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            const r = vp.getBoundingClientRect();
+            arvoreZoomAt(e.clientX - r.left, e.clientY - r.top, _arvView.s * (e.deltaY < 0 ? 1.1 : 0.9));
+        }, { passive: false });
+        const rc = document.getElementById('arvoreRecenter');
+        if (rc) rc.addEventListener('click', arvoreCenterView);
+    }
+    arvoreCenterView();
 }
 
 /* ===========================================

@@ -1263,22 +1263,19 @@
         <!-- ===== ÁRVORE DE EVOLUÇÃO ===== -->
         <div class="content-section" id="arvoreEvolucaoSection">
             <div class="star-particles" data-particles="arvoreEvolucao"></div>
-            <div class="ar-hero">
-                <h1 class="ar-title">ÁRVORE DE EVOLUÇÃO</h1>
-                <p class="ar-quote">"Quanto mais forte for seus atributos, melhor será o seu caminho"</p>
-                <div class="ar-nivel-badge">NÍVEL ATUAL <span id="arvoreNivel">0</span> <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;opacity:0.7"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg></div>
-            </div>
-            <p class="ar-hint">CLIQUE NOS CARDS PARA DESCOBRIR ALGO ÚNICO!</p>
-            <div class="ar-info" id="arvoreInfo"></div>
-            <!-- Filter pills -->
-            <div class="ar-filter-pills" id="arvoreFilterPills"></div>
-            <!-- Árvore em leque radial (altura definida pelo JS) -->
+            <!-- Mapa arrastável (viewport) -->
             <div class="ar-tree-canvas" id="arvoreTreeCanvas">
-                <svg class="ar-tree-svg" id="arvoreTreeSvg" xmlns="http://www.w3.org/2000/svg"></svg>
-                <div class="ar-tree-nodes" id="arvoreTreeNodes"></div>
+                <div class="ar-map" id="arvoreMap">
+                    <svg class="ar-tree-svg" id="arvoreTreeSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+                    <div class="ar-tree-nodes" id="arvoreTreeNodes"></div>
+                </div>
             </div>
-            <div class="ar-progress" id="arvoreProgress"></div>
-
+            <div class="ar-info" id="arvoreInfo"></div>
+            <div class="ar-bottom">
+                <div class="ar-filter-pills" id="arvoreFilterPills"></div>
+                <div class="ar-progress" id="arvoreProgress"></div>
+            </div>
+            <button type="button" class="ar-recenter" id="arvoreRecenter" aria-label="Centralizar mapa">&#8982;</button>
         </div>
 
         <!-- ===== ARQUITETO (personagem) ===== -->
