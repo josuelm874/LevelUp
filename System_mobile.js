@@ -1,7 +1,7 @@
 // System_mobile.js — botão Voltar do Android/PWA: fecha modal/menu, depois volta ao Painel; só então sai.
 (function () {
     'use strict';
-    const OVERLAYS = ['.mz-task-modal-overlay', '.it-modal-overlay', '.settings-modal', '.shop-modal:not(.hidden)', '#taskModal', '#arvoreModalOverlay'];
+    const OVERLAYS = ['.mz-task-modal-overlay', '.it-modal-overlay', '.settings-modal', '.shop-modal:not(.hidden)', '#taskModal'];
     // offsetParent é null em position:fixed (modais): usa getClientRects
     const visible = el => el && el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden';
 
@@ -11,7 +11,7 @@
             const els = [...document.querySelectorAll(sel)].filter(visible);
             const el = els[els.length - 1];
             if (!el) continue;
-            const btn = el.querySelector('.settings-close, .btn-modal-cancel, .shop-modal-btn.outline, .ar-modal-close, [id$="Close"]');
+            const btn = el.querySelector('.settings-close, .btn-modal-cancel, .shop-modal-btn.outline, [id$="Close"]');
             if (btn) btn.click(); else el.remove();
             return true;
         }

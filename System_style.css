@@ -10923,229 +10923,37 @@ body.sys-app .mission-video-box--nova.settings-box {
     flex-shrink: 0;
 }
 
-/* Árvore: canvas centrado diretamente na secção */
-.ar-tree-canvas {
-    position: relative;
-    display: block;
-    height: 590px; /* JS ajusta dinamicamente */
-    width: min(760px, 100%);
-    max-width: 100%;
-    margin: 0 auto;
-    padding-bottom: clamp(1.25rem, 6vh, 3.5rem);
-    box-sizing: border-box;
-    min-width: 0;
-    /* Metade do lado do quadrado (px); renderArvoreTree() atualiza para alinhar SVG + DOM */
-    --ar-node-half: 35px;
-}
-/* Sem ::before/::after no canvas: antes o JS copiava para --ar-mystery-zone-h até centenas de px
-   (offset vertical dos nós), o que fazia o véu verde-água cobrir quase o ecrã inteiro. */
-.ar-tree-svg {
-    position: absolute;
-    top: 0; left: 0;
-    pointer-events: none;
-    z-index: 0;
-}
-.ar-tree-nodes {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 2;
-}
-
-/* Tree nodes (square cards) */
-.ar-tnode {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: opacity 0.25s;
-}
-.ar-tnode-square {
-    width: calc(var(--ar-node-half, 35px) * 2);
-    height: calc(var(--ar-node-half, 35px) * 2);
-    border: 2px solid;
-    border-color: inherit;
-    border-style: inherit;
-    background: inherit;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: box-shadow 0.22s, transform 0.18s;
-    border-radius: 10px;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
-}
-.ar-tnode:hover .ar-tnode-square {
-    box-shadow: 0 0 22px rgba(45,212,191,0.45);
-    transform: scale(1.07);
-}
-.ar-tnode-num {
-    font-family: var(--sl-font-display);
-    font-size: clamp(0.72rem, calc(var(--ar-node-half, 35px) * 0.72), 1.2rem);
-    font-weight: 700;
-    color: rgba(255,255,255,0.65);
-    line-height: 1;
-}
-.ar-tnode-lock { color: rgba(255,255,255,0.55); display: inline-flex; }
-.ar-tnode-caption {
-    font-size: 0.58rem;
-    font-weight: 600;
-    color: rgba(255,255,255,0.45);
-    letter-spacing: 0.08em;
-    text-align: center;
-    white-space: nowrap;
-    text-transform: uppercase;
-    pointer-events: none;
-}
-.ar-tnode--locked {
-    opacity: 0.16;
-    filter: saturate(0.85);
-}
-.ar-tnode--locked .ar-tnode-square {
-    box-shadow: none;
-}
-.ar-tnode--locked:hover .ar-tnode-square { box-shadow: none; transform: none; }
-.ar-tnode--dim { opacity: 0.1; pointer-events: none; }
-
-/* Branch labels */
-.ar-branch-label {
-    position: absolute;
-    font-family: var(--sl-font-display);
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-align: center;
-    width: 120px;
-    pointer-events: none;
-    white-space: nowrap;
-    z-index: 3;
-}
-.ar-branch-fisico {
-    color: #f87171;
-    text-shadow: 0 0 10px rgba(248,113,113,0.45);
-}
-.ar-branch-mental {
-    color: #60a5fa;
-    text-shadow: 0 0 10px rgba(96,165,250,0.35);
-}
-
-/* Modal overlay */
-.ar-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.75);
-    backdrop-filter: blur(5px);
-    z-index: 1200;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.22s;
-}
-.ar-modal-overlay.active {
-    opacity: 1;
-    pointer-events: all;
-}
-.ar-modal {
-    position: relative;
-    background: #0d1020;
-    border: 1px solid rgba(45,212,191,0.25);
-    border-radius: 16px;
-    padding: 32px 28px 24px;
-    width: min(400px, 90vw);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    box-shadow: 0 0 60px rgba(45,212,191,0.08), 0 24px 60px rgba(0,0,0,0.7);
-    animation: ar-modal-in 0.26s cubic-bezier(.34,1.56,.64,1);
-}
-@keyframes ar-modal-in {
-    from { transform: scale(0.88); opacity: 0; }
-    to   { transform: scale(1);    opacity: 1; }
-}
-.ar-modal-close {
-    position: absolute;
-    top: 12px; right: 12px;
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.22);
-    background: rgba(255,255,255,0.05);
-    color: rgba(255,255,255,0.6);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.72rem;
-    line-height: 1;
-    transition: all 0.18s;
-    outline: none;
-}
-.ar-modal-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
-.ar-modal-icon-wrap {
-    width: 56px; height: 56px;
-    border-radius: 50%;
-    border: 2px solid #2dd4bf;
-    background: rgba(45,212,191,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.7rem;
-    flex-shrink: 0;
-}
-.ar-modal-title {
-    font-family: var(--sl-font-display);
-    font-size: 1rem;
-    font-weight: 700;
-    color: #2dd4bf;
-    letter-spacing: 0.08em;
-    text-align: center;
-    margin: 0;
-}
-.ar-modal-virtudes-block { width: 100%; }
-.ar-modal-virtudes-head {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: rgba(255,255,255,0.7);
-    letter-spacing: 0.06em;
-    margin-bottom: 8px;
-}
-.ar-modal-virtudes-body {
-    font-size: 0.72rem;
-    color: rgba(255,255,255,0.48);
-    line-height: 1.6;
-    text-align: center;
-    margin: 0;
-}
-.ar-modal-quote {
-    width: 100%;
-    background: rgba(255,255,255,0.04);
-    border-radius: 10px;
-    padding: 14px 16px;
-    font-size: 0.72rem;
-    color: rgba(255,255,255,0.58);
-    line-height: 1.6;
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-}
-.ar-quote-mark {
-    font-size: 1.3rem;
-    color: #2dd4bf;
-    line-height: 0.9;
-    flex-shrink: 0;
-    font-style: normal;
-}
-.ar-modal-footer {
-    font-family: var(--sl-font-display);
-    font-size: 0.6rem;
-    font-weight: 600;
-    color: rgba(255,255,255,0.32);
-    letter-spacing: 0.1em;
-    text-align: center;
-}
+/* Árvore: leque radial */
+.ar-tree-canvas { position: relative; width: min(560px, 100%); margin: 0 auto; box-sizing: border-box; min-width: 0; height: 520px;
+    background: radial-gradient(ellipse at 50% 72%, rgba(40,110,255,.16), transparent 62%); }
+.ar-tree-svg { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 0; }
+.ar-tree-nodes { position: absolute; inset: 0; z-index: 2; }
+.ar-n { position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-sizing: border-box; cursor: pointer;
+    border: 2px solid var(--c); background: radial-gradient(circle at 35% 30%, rgba(var(--rgb), .6), rgba(var(--rgb), .16) 72%);
+    box-shadow: 0 0 14px rgba(var(--rgb), .55), inset 0 0 8px rgba(255,255,255,.2); transition: opacity .25s, box-shadow .2s; }
+.ar-n-ico { font-size: calc(var(--s) * .46); line-height: 1; filter: drop-shadow(0 0 4px rgba(255,255,255,.55)); }
+.ar-n--locked { border-style: dashed; border-color: rgba(var(--rgb), .42); background: rgba(4,10,24,.88); box-shadow: none; color: rgba(210,230,255,.5); }
+.ar-n--root { outline: 1px solid rgba(190,235,255,.55); outline-offset: 5px; }
+.ar-n--sel { outline: 2px solid #eaffff; outline-offset: 4px; box-shadow: 0 0 24px rgba(var(--rgb), .95), inset 0 0 8px rgba(255,255,255,.25); }
+.ar-n--new { animation: ar-pulse 1.8s ease-in-out infinite; }
+@keyframes ar-pulse { 50% { box-shadow: 0 0 26px 5px rgba(var(--rgb), .9), inset 0 0 8px rgba(255,255,255,.2); } }
+.ar-n--dim { opacity: .12; pointer-events: none; }
+.ar-bl, .ar-cap { position: absolute; transform: translateX(-50%); font: 700 .54rem var(--sl-font-display); letter-spacing: .14em; white-space: nowrap; pointer-events: none; z-index: 3; }
+.ar-bl { color: var(--c); text-shadow: 0 0 8px var(--c); }
+.ar-cap { color: rgba(190,235,255,.7); }
+.ar-info { --c: #7fe3ff; margin: 6px auto 4px; width: min(560px, calc(100% - 28px)); box-sizing: border-box; padding: 10px 14px; min-height: 92px;
+    border-left: 3px solid var(--c); background: linear-gradient(90deg, rgba(10,40,90,.35), transparent); }
+.ar-info-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.ar-info-name { font: 700 .9rem var(--sl-font-display); letter-spacing: .08em; color: #eaffff; text-shadow: 0 0 10px var(--c); }
+.ar-info-tag { font-size: .62rem; letter-spacing: .1em; color: var(--c); }
+.ar-info-body { margin-top: 6px; font-size: .74rem; line-height: 1.5; color: rgba(255,255,255,.72); }
+.ar-info-quote { margin-top: 6px; font-size: .7rem; font-style: italic; color: rgba(190,225,255,.5); }
+.ar-info-hint { font-size: .74rem; color: rgba(190,225,255,.55); padding-top: 22px; }
+.ar-progress { width: min(560px, calc(100% - 28px)); margin: 0 auto; padding: 4px 0 22px; text-align: center; }
+.ar-prog-lbl { font: 600 .62rem var(--sl-font-display); letter-spacing: .12em; color: rgba(190,225,255,.7); margin-bottom: 8px; }
+.ar-prog-lbl b { font-size: 1.3rem; color: #eaffff; margin-right: 6px; text-shadow: 0 0 10px #4aa8ff; }
+.ar-prog-bar { height: 3px; background: rgba(150,200,255,.2); }
+.ar-prog-bar i { display: block; height: 100%; background: linear-gradient(90deg, #4aa8ff, #eaffff); box-shadow: 0 0 8px #4aa8ff; }
 
 /* ========================================================================
    MOBILE — espaçamento e quebras para evitar “espremimento” (≤640px)
@@ -11375,21 +11183,6 @@ body.sys-app .mission-video-box--nova.settings-box {
         padding-left: clamp(8px, 3vw, 14px);
         padding-right: clamp(8px, 3vw, 14px);
     }
-    #arvoreEvolucaoSection .ar-tnode {
-        gap: clamp(4px, 2vw, 8px);
-    }
-    /* Evita que scale(1.07) empilhe cartões vizinhos no toque */
-    #arvoreEvolucaoSection .ar-tnode:hover .ar-tnode-square {
-        transform: none;
-    }
-    #arvoreEvolucaoSection .ar-branch-label {
-        width: min(116px, 32vw);
-        max-width: min(160px, 42vw);
-        text-align: center;
-        font-size: 0.58rem;
-        line-height: 1.25;
-        white-space: normal;
-    }
 }
 /* ===== Mobile / toque + card de backup e sync ===== */
 html { overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; }
@@ -11445,3 +11238,4 @@ body.sys-app { padding-bottom: env(safe-area-inset-bottom, 0px); padding-top: en
 .sl-msg.sl-bad { color: #ff7b8a; }
 .sl-links { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; }
 .sl-links button { background: none; border: 0; padding: 6px 0; color: #7fc6ff; font: 600 .95rem Rajdhani, sans-serif; text-decoration: underline; cursor: pointer; }
+.ar-tree-nodes .ar-n { min-height: 0; min-width: 0; } /* anula min-height:44px de [role=button] no toque: o nó é redondo */

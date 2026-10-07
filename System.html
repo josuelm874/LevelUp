@@ -1269,31 +1269,16 @@
                 <div class="ar-nivel-badge">NÍVEL ATUAL <span id="arvoreNivel">0</span> <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;opacity:0.7"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg></div>
             </div>
             <p class="ar-hint">CLIQUE NOS CARDS PARA DESCOBRIR ALGO ÚNICO!</p>
+            <div class="ar-info" id="arvoreInfo"></div>
             <!-- Filter pills -->
             <div class="ar-filter-pills" id="arvoreFilterPills"></div>
-            <!-- Árvore (canvas centrado na secção; altura definida pelo JS) -->
+            <!-- Árvore em leque radial (altura definida pelo JS) -->
             <div class="ar-tree-canvas" id="arvoreTreeCanvas">
                 <svg class="ar-tree-svg" id="arvoreTreeSvg" xmlns="http://www.w3.org/2000/svg"></svg>
                 <div class="ar-tree-nodes" id="arvoreTreeNodes"></div>
-                <div class="ar-branch-label ar-branch-fisico" id="arBranchFisico">CAMINHO FÍSICO</div>
-                <div class="ar-branch-label ar-branch-mental" id="arBranchMental">CAMINHO MENTAL</div>
             </div>
-            <!-- Node modal -->
-            <div class="ar-modal-overlay" id="arvoreModalOverlay" onclick="if(event.target===this)closeArvoreModal()">
-                <div class="ar-modal" id="arvoreModal">
-                    <button class="ar-modal-close" onclick="closeArvoreModal()">&#10005;</button>
-                    <div class="ar-modal-icon-wrap" id="arvoreModalIconWrap">
-                        <span id="arvoreModalIcon">&#9889;</span>
-                    </div>
-                    <h2 class="ar-modal-title" id="arvoreModalTitle">O DESPERTAR</h2>
-                    <div class="ar-modal-virtudes-block">
-                        <div class="ar-modal-virtudes-head">&#128274; VIRTUDES &amp; PROGRESSO</div>
-                        <p class="ar-modal-virtudes-body" id="arvoreModalVirtudes"></p>
-                    </div>
-                    <div class="ar-modal-quote" id="arvoreModalQuote"></div>
-                    <div class="ar-modal-footer" id="arvoreModalNivelFase">N&Iacute;VEL 0&nbsp;&nbsp;&nbsp;FASE 1</div>
-                </div>
-            </div>
+            <div class="ar-progress" id="arvoreProgress"></div>
+
         </div>
 
         <!-- ===== ARQUITETO (personagem) ===== -->
