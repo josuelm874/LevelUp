@@ -1873,6 +1873,7 @@ class GameSystem {
         setEl('levelText', nivel);
         setEl('rankText', rank);
         setEl('painelApelidoSub', apelido);
+        setEl('painelHeroName', nome.toUpperCase());
         const pCardTitle = document.getElementById('painelCardNivelTitle');
         if (pCardTitle) pCardTitle.textContent = `NÍVEL ${nivel} — ${apelido}`;
         setEl('painelKpiVirtude', tituloNome !== 'NENHUM' ? tituloNome : '—');
