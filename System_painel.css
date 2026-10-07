@@ -1,0 +1,43 @@
+/* Painel reorganizado (classe .p2 aplicada por System_painel.js) */
+#statusSection .sys-painel.p2 { display: flex; flex-direction: column; gap: 12px; }
+#statusSection .p2 > * { margin-top: 0; margin-bottom: 0; min-width: 0; }
+
+/* cabeçalho compacto: avatar à esquerda, dados à direita */
+#statusSection .p2 .sys-painel-hero { display: grid; grid-template-columns: 92px 1fr; column-gap: 14px; row-gap: 2px; align-items: center; text-align: left; padding: 6px 0; margin: 0; }
+#statusSection .p2 .sys-painel-avatar-ring { grid-column: 1; grid-row: 1 / span 3; width: 92px; height: 92px; margin: 0; }
+#statusSection .p2 .sys-painel-hero-name { grid-column: 2; grid-row: 1; margin: 0; font-size: 1.3rem; letter-spacing: .08em; text-align: left; }
+#statusSection .p2 .sys-painel-kpi--virtue { grid-column: 2; grid-row: 2; display: flex; align-items: center; gap: 6px; width: auto; min-height: 0; padding: 0; border: 0; background: none; box-shadow: none; }
+#statusSection .p2 .sys-painel-kpi--virtue .sys-painel-kpi-icon { width: 18px; height: 18px; flex: none; }
+#statusSection .p2 .sys-painel-kpi--virtue .sys-painel-kpi-label { display: none; }
+#statusSection .p2 .sys-painel-kpi--virtue .sys-painel-kpi-value { font-size: .72rem; letter-spacing: .06em; color: var(--sl-purple-soft); text-align: left; }
+#statusSection .p2 .sys-painel-nivel-rank-block { grid-column: 2; grid-row: 3; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 4px 0 0; }
+#statusSection .p2 .sys-painel-nivel-rank-hr { display: none; }
+#statusSection .p2 .sys-painel-rank-line { margin: 0; }
+
+/* vitais + moedas */
+#statusSection .p2 .sys-painel-mid { display: flex; flex-direction: column; gap: 10px; }
+#statusSection .p2 .sys-painel-card--currency .sys-painel-currency-divider,
+#statusSection .p2 .sys-painel-card--currency .sys-painel-currency-col--rank { display: none; }
+#statusSection .p2 .sys-painel-card--currency .sys-painel-currency-split { justify-content: center; }
+#statusSection .p2 .sys-painel-card--currency { min-height: 0 !important; }
+#statusSection .p2 .sys-painel-card--currency .sys-painel-card__inner { padding-block: 14px; }
+#statusSection .p2 .bar-fill.exp-bar { background: linear-gradient(90deg, #f59e0b, #fbbf24) !important; }
+#statusSection .p2 .bar-fill.hp-bar { background: linear-gradient(90deg, #16a34a, #4ade80) !important; }
+#statusSection .p2 .bar-fill.mp-bar { background: linear-gradient(90deg, #2563eb, #60a5fa) !important; }
+
+/* faixa de 3 números */
+#statusSection .p2 .sys-painel-kpi-row.p2-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0; background: none; border: 0; box-shadow: none; }
+#statusSection .p2 .p2-strip .sys-painel-kpi { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 92px; padding: 10px 6px; text-align: center; border-radius: 14px; border: 1px solid rgba(0,229,255,.2); background: rgba(255,255,255,.04); }
+#statusSection .p2 .p2-strip .sys-painel-kpi-icon { display: none; }
+#statusSection .p2 .p2-strip .sys-painel-kpi-body { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+#statusSection .p2 .p2-strip .sys-painel-kpi-label { font-size: .56rem; letter-spacing: .12em; color: rgba(255,255,255,.55); }
+#statusSection .p2 .p2-strip .sys-painel-kpi-value { font: 700 1.5rem var(--sl-font-num); color: #fff; }
+#statusSection .p2 .p2-strip .sys-painel-kpi--xpday .sys-painel-kpi-value { color: var(--sl-gold); }
+#statusSection .p2 .p2-strip .sys-painel-kpi--done .sys-painel-kpi-value { color: var(--sl-green-2); }
+#statusSection .p2 .sys-painel-kpi--arena { cursor: pointer; border-color: rgba(251,146,60,.45) !important; }
+#statusSection .p2 .p2-arena-val, #statusSection .p2 .p2-arena-val .sys-painel-arena-rank-hash { font: 700 1.5rem var(--sl-font-num); color: var(--sl-orange); }
+#statusSection .p2 .p2-arena-sub, #statusSection .p2 .p2-arena-sub .sys-painel-arena-rank-sub { font-size: .52rem; line-height: 1.2; color: rgba(255,255,255,.55); }
+
+/* Arquiteto no topo */
+#statusSection .p2 .sys-painel-arquiteto { position: relative; margin: 0; }
+.p2-arq-btn { margin-top: 10px; min-height: 40px; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(99,102,241,.55); background: rgba(99,102,241,.14); color: #c7d2fe; font: 700 .7rem var(--sl-font-display); letter-spacing: .12em; cursor: pointer; }
