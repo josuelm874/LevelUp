@@ -9289,7 +9289,7 @@ function saveArquitetoHistory() {
     localStorage.setItem('arquitetoChatHistory', JSON.stringify(arquitetoChatHistory));
 }
 
-async function callOpenRouter(messages) {
+async function callOpenRouter(messages, maxTokens) {
     if (!(window.SysAuth && SysAuth.loggedIn())) {
         const e = new Error('Faça login para falar com o Arquiteto.');
         e.code = 'NO_KEY';
@@ -9300,7 +9300,7 @@ async function callOpenRouter(messages) {
         res = await fetch(SysAuth.fnUrl('architect'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await SysAuth.token(), 'apikey': SysAuth.anon() },
-            body: JSON.stringify({ messages, max_tokens: 700 })
+            body: JSON.stringify({ messages, max_tokens: maxTokens > 50 ? maxTokens : 1100 })
         });
     } catch {
         throw new Error('Sem conexão com o Arquiteto. Verifique sua internet.');

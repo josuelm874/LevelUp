@@ -74,12 +74,12 @@ Hoje: ${hoje} (${hojeKey})
 ═══ CRIAR COISAS PARA O CAÇADOR ═══
 Você pode criar itens no Sistema. Quando o caçador pedir (missão, hábito, item de recompensa, habilidade):
 1. Faça UMA pergunta curta por vez sobre o que faltar (objetivo, frequência, prazo ou datas, se precisa de checklist, prioridade, esforço). Se ele já deu tudo, não pergunte mais.
-2. Com informação suficiente, escreva uma frase curta e termine a resposta com UM bloco no formato exato:
+2. Com informação suficiente, escreva NO MÁXIMO 2 frases curtas (sem repetir os dados que ele deu) e termine a resposta com UM bloco no formato exato, em JSON de uma linha só:
 \`\`\`acao
 {"tipo":"criar_missao","titulo":"...","descricao":"...","frequencia":"unica|diaria|semanal|mensal|anual|intervalo","intervalo":1,"dataInicial":"AAAA-MM-DD","dataFinal":"AAAA-MM-DD ou vazio","prioridade":"alta|media|baixa","periodo":"manha|tarde|noite|flex","segmento":"${SEGMENTS.join('|')}","checklist":["passo 1","passo 2"],"exp":60,"moedas":10,"atributo":"${ATTRS.join('|')}","atributoValor":0.5}
 \`\`\`
 Outros tipos: {"tipo":"criar_habito","titulo":"...","descricao":"...","frequencia":"diaria","dataInicial":"AAAA-MM-DD"} | {"tipo":"criar_item","nome":"...","icone":"emoji","preco":3000} | {"tipo":"propor_habilidade","nome":"...","tipoHab":"estudo|combate","atributo":"...","descricao":"..."}.
-- exp deve refletir o esforço real (5 a 500; tarefa rápida 20-50, sessão longa 100-300). moedas: 0 a 80, só se a missão merecer. atributoValor entre 0 e 2.
+- exp deve refletir o esforço real e a frequência: missão que se repete todo dia ou toda semana vale pouco (10 a 60); tarefa única de esforço médio 50 a 150; meta grande e única 150 a 400. Nunca passe de 500. moedas: 0 a 80 (0 para tarefas pequenas). atributoValor entre 0 e 2 (rotinas diárias 0.1 a 0.5).
 - Nunca diga que já criou: o caçador confirma num cartão que o app mostra.`;
         }
         return p;
@@ -93,7 +93,7 @@ Outros tipos: {"tipo":"criar_habito","titulo":"...","descricao":"...","frequenci
         const text = String(reply || '').replace(/```(?:acao|json)?\s*(\{[\s\S]*?\})\s*```/gi, function (m, body) {
             try { const j = JSON.parse(body); if (j && KNOWN.indexOf(j.tipo) >= 0) { actions.push(j); return ''; } } catch (e) { /* bloco não é ação */ }
             return m;
-        }).trim();
+        }).replace(/```acao[\s\S]*$/i, '').trim(); // bloco que veio cortado não aparece no chat
         return { text, actions };
     };
 
@@ -250,9 +250,14 @@ Outros tipos: {"tipo":"criar_habito","titulo":"...","descricao":"...","frequenci
         if (btn) btn.disabled = true;
         try {
             const recent = arquitetoChatHistory.slice(-20).map(function (m) { return { role: m.role, content: m.content }; });
-            const reply = await callOpenRouter([{ role: 'system', content: buildArquitetoSystemPrompt(true) }].concat(recent));
+            const base = [{ role: 'system', content: buildArquitetoSystemPrompt(true) }].concat(recent);
+            let reply = await callOpenRouter(base);
+            let r = extractArqActions(reply);
+            if (/```acao/i.test(reply) && !r.actions.length) { // bloco cortado ou JSON inválido: uma nova tentativa, mais curta
+                reply = await callOpenRouter(base.concat([{ role: 'assistant', content: reply }, { role: 'user', content: 'Seu bloco de ação veio incompleto. Responda de novo com UMA frase curta e o bloco ```acao completo, em JSON de uma linha.' }]), 1200);
+                r = extractArqActions(reply);
+            }
             hideArquitetoTyping();
-            const r = extractArqActions(reply);
             arquitetoChatHistory.push({ role: 'assistant', content: r.text || 'Como deseja prosseguir?', actions: r.actions, timestamp: Date.now() });
         } catch (err) {
             hideArquitetoTyping();
@@ -282,7 +287,7 @@ Outros tipos: {"tipo":"criar_habito","titulo":"...","descricao":"...","frequenci
                     { role: 'system', content: buildArquitetoSystemPrompt(false) },
                     { role: 'user', content: '[EVENTO AUTOMÁTICO DO SISTEMA] ' + facts + ' Escreva UMA mensagem curta (no máximo 2 frases) do Arquiteto para o caçador sobre isso. Sem listas e sem blocos de ação.' }
                 ]);
-                const t = extractArqActions(out).text;
+                const t = extractArqActions(out).text.replace(/^\s*(?:\*\*)?Arquiteto(?:\*\*)?\s*[:\-—]\s*/i, '');
                 if (t) msg = t;
             } catch (e) { /* usa o texto-padrão */ }
         }
