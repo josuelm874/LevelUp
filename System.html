@@ -881,7 +881,6 @@
                         </div>
                         <button type="button" class="arena-rewards-cta" id="arenaOpenItensBtn">Abrir coleção</button>
                     </div>
-                    <div class="arena-rewards-stats" id="arenaRewardsStats"></div>
                 </div>
             </div>
         </div>
@@ -1386,40 +1385,6 @@
 </div>
 
 <!-- Modal de Configurações (Cadastro de Itens) -->
-<div class="settings-modal hidden" id="settingsModal">
-    <div class="settings-backdrop"></div>
-    <div class="settings-box">
-        <div class="settings-header">
-            <h3 class="settings-title">CADASTRAR ITEM NA LOJA</h3>
-            <button class="settings-close" id="settingsClose">×</button>
-        </div>
-        <div class="settings-content">
-            <form id="itemForm" class="item-form">
-                <div class="form-group">
-                    <label class="form-label">Ícone do Item (Imagem/GIF):</label>
-                    <div class="icon-preview-container">
-                        <input type="file" id="itemIcon" class="form-file-input" accept="image/*" required>
-                        <div class="icon-preview" id="iconPreview">
-                            <span class="preview-placeholder">Preview do ícone</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Nome do Item:</label>
-                    <input type="text" id="itemName" class="form-input" placeholder="Ex: ESPADA LEGENDÁRIA" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Valor (G):</label>
-                    <input type="number" id="itemPrice" class="form-input" placeholder="Ex: 100000" min="0" required>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="form-btn cancel-btn" id="cancelItemBtn">CANCELAR</button>
-                    <button type="submit" class="form-btn submit-btn">CADASTRAR</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <script src="System_script.js"></script>
 <script src="System_sync.js"></script>
