@@ -40,6 +40,20 @@
     root.insertBefore(mid, row);
     mid.appendChild(level);
     mid.appendChild(money);
+    /* anel dos atributos: fração decimal rumo ao próximo ponto (--p em %) */
+    const GS = typeof GameSystem !== 'undefined' ? GameSystem : null;
+    if (GS) {
+        const orig = GS.prototype.updateAttributesDisplay;
+        const rings = function () {
+            const at = (this.data && this.data.atributos) || {};
+            document.querySelectorAll('#statusSection .sys-attr-card[data-attr]').forEach((c) => {
+                const v = Number(at[c.dataset.attr]) || 0;
+                c.style.setProperty('--p', Math.round((v - Math.floor(v)) * 100));
+            });
+        };
+        GS.prototype.updateAttributesDisplay = function () { orig.apply(this, arguments); rings.call(this); };
+        if (typeof gameSystem !== 'undefined' && gameSystem) rings.call(gameSystem);
+    }
     row.classList.add('p2-strip');
     if (arq) {
         row.after(arq);
