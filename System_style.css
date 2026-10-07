@@ -11193,3 +11193,27 @@ body.sys-app { padding-bottom: env(safe-area-inset-bottom, 0px); padding-top: en
 .arq-act-state { margin-top: 8px; font-size: .72rem; color: rgba(255,255,255,.5); }
 .arq-act-state--ok { color: #8be9a8; }
 .arq-act-state--bad { color: #ff8a8a; }
+
+/* ===== Formulário de Missão/Hábito (System_missoes.js) e card ===== */
+.mf2-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.mf2-chip { padding: 9px 14px; min-height: 40px; font: 600 .78rem Inter, sans-serif; color: rgba(255,255,255,.7); background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.16); border-radius: 999px; cursor: pointer; }
+.mf2-chip.on { color: #fff; background: rgba(0,200,255,.18); border-color: rgba(0,229,255,.7); box-shadow: 0 0 10px rgba(0,229,255,.25); }
+.mf2-switchrow { display: flex; align-items: center; justify-content: space-between; margin: 6px 0 10px; font-size: .85rem; color: rgba(255,255,255,.8); }
+.mf2-switch { position: relative; width: 48px; height: 28px; display: inline-block; }
+.mf2-switch input { opacity: 0; width: 100%; height: 100%; position: absolute; margin: 0; cursor: pointer; z-index: 1; }
+.mf2-switch i { position: absolute; inset: 0; border-radius: 999px; background: rgba(255,255,255,.15); transition: background .2s; }
+.mf2-switch i::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform .2s; }
+.mf2-switch input:checked + i { background: rgba(0,200,255,.6); }
+.mf2-switch input:checked + i::after { transform: translateX(20px); }
+.mf2-int { margin-top: 10px; font-size: .82rem; color: rgba(255,255,255,.75); display: flex; align-items: center; gap: 8px; }
+.mf2-int input { width: 72px; padding: 8px; font-size: 16px; color: inherit; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.2); border-radius: 8px; }
+.mf2-err { margin: 6px 0 0; font-size: .8rem; color: #ff8a8a; }
+.mf2-rm { background: none; border: 0; color: rgba(255,255,255,.55); font-size: 1.2rem; padding: 0 8px; cursor: pointer; }
+.mfv-check-row { display: flex; align-items: center; justify-content: space-between; }
+.vid-mission-card--p-alta { border-left: 3px solid #ff6b6b; }
+.vid-mission-card--p-media { border-left: 3px solid #ffc857; }
+.vid-mission-card--p-baixa { border-left: 3px solid #5eead4; }
+.vid-tag--end { color: #ffd58a; border-color: rgba(255,213,138,.45); }
+.vid-mission-ia { margin: 6px 0 2px; font-size: .72rem; line-height: 1.45; font-style: italic; color: rgba(200,190,255,.8); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.vid-mission-ia b { font-style: normal; font-size: .62rem; letter-spacing: .12em; color: #a99bff; margin-right: 4px; }
+.mf2-int[hidden], #mf2EndWrap[hidden], #mf2CheckBox[hidden], #mf2Err[hidden] { display: none !important; }

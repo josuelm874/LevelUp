@@ -5774,6 +5774,17 @@ function buildMissionCardHtmlVideo(m, viewKey, viewDate) {
     // Category tag
     const categoryTag = m.category ? `<span class="vid-tag vid-tag--cat">${_escapeHtml(m.category)}</span>` : '';
 
+    // Barra lateral por prioridade, data final e análise do Arquiteto
+    const prioKey = ['alta', 'baixa'].indexOf(String(m.priority || '').toLowerCase()) >= 0 ? String(m.priority).toLowerCase() : 'media';
+    let endChip = '';
+    if (m.endDate) {
+        const left = Math.round((parseLocalDate(m.endDate) - parseLocalDate(getTodayKey())) / 86400000);
+        const dd = String(m.endDate).slice(8, 10) + '/' + String(m.endDate).slice(5, 7);
+        endChip = '<span class="vid-tag vid-tag--end">' + (left < 0 ? 'ENCERRADA ' + dd : 'ATÉ ' + dd + (left === 0 ? ' · HOJE' : ' · FALTAM ' + left + 'D')) + '</span>';
+    }
+    const iaLine = (m.analiseIA && m.analiseIA.justificativa)
+        ? '<p class="vid-mission-ia"><b>ARQUITETO</b> ' + _escapeHtml(m.analiseIA.justificativa) + '</p>' : '';
+
     // Progress bar (for missions with progress tracking)
     let progressBar = '';
     if (m.progress && m.progress.enabled && m.progress.max > 0) {
@@ -5818,18 +5829,20 @@ function buildMissionCardHtmlVideo(m, viewKey, viewDate) {
                 </div>`;
 
     return `
-        <div class="vid-mission-card${isArchived ? ' vid-mission-card--archived' : ''}${isPriorityAlta ? ' vid-mission-card--alta' : ''}" data-id="${m.id}" data-archived="${isArchived ? '1' : '0'}">
+        <div class="vid-mission-card${isArchived ? ' vid-mission-card--archived' : ''}${isPriorityAlta ? ' vid-mission-card--alta' : ''} vid-mission-card--p-${prioKey}" data-id="${m.id}" data-archived="${isArchived ? '1' : '0'}">
             <div class="vid-mission-toprow">
                 <div class="vid-mission-title">${priorityDot}${_escapeHtml(m.titulo || '')}</div>
                 ${topBtns}
             </div>
             ${desc}
             ${viewMore}
+            ${iaLine}
             ${progressBar}
             <div class="vid-mission-tags">
                 ${archivalTag}
                 <span class="vid-tag vid-tag--daily">${_escapeHtml(rec || 'Diário')}</span>
                 ${categoryTag}
+                ${endChip}
                 ${checklistCount}
                 ${attr ? `<span class="vid-tag vid-tag--attr">${_escapeHtml(attr)}</span>` : ''}
                 ${rewardLine ? `<span class="vid-rew">${_escapeHtml(rewardLine)}</span>` : ''}
@@ -7652,6 +7665,7 @@ function _buildHabitRowHtml(h, todayKey) {
             </div>
             <div class="task-meta">
                 <span class="task-recurring">${getRecurrenceLabel(h.recurrence)}</span>
+                ${(h.rewards && h.rewards.exp > 0) ? `<span class="task-tag">+${h.rewards.exp} XP${h.rewards.moedas > 0 ? ' · +' + h.rewards.moedas + ' G' : ''}</span>` : ''}
                 <span class="task-progress ${completed ? 'completed' : ''}">${progressText}</span>
                 ${progressSection}
                 <div class="task-actions">
