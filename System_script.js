@@ -9742,6 +9742,33 @@ Object.keys(ARVORE_DEF).forEach(function(attr) {
     });
 });
 
+// Trilhas longas: depois do tier 3 cada ramo segue até o tier 8 e os dois ramos se unem no ápice do atributo (tier 9).
+// Ordem: [4a,4b,5a,5b,6a,6b,7a,7b,8a,8b,ápice]
+const ARVORE_LONG_LEVELS = [60, 65, 75, 80, 90, 95, 110, 120, 140, 150, 200];
+const ARVORE_LONG = {
+    forca: [['Braço de Titã','🦾'],['Passo Pesado','🦶'],['Fúria Contida','😤'],['Pele de Pedra','🪨'],['Impacto Sísmico','🌋'],['Lâmina Viva','⚔️'],['Gigante Desperto','🗻'],['Muralha Humana','🏰'],['Força Lendária','🔱'],['Quebra-Mundos','☄️'],['APEX DA FORÇA','🏆']],
+    vitalidade: [['Pulmão de Aço','🫁'],['Sangue Quente','🩸'],['Banho de Gelo','🧊'],['Dieta de Guerreiro','🥗'],['Pele Curativa','🩹'],['Maratonista','🏃'],['Fonte da Vida','⛲'],['Imunidade Plena','🛡️'],['Corpo Eterno','🌿'],['Segundo Fôlego','💨'],['APEX DA VITALIDADE','🏆']],
+    foco: [['Linha de Visão','🔭'],['Mente Cristalina','🔮'],['Fluxo Profundo','🌊'],['Relógio Interno','⏳'],['Alvo Fixo','🏹'],['Visão Tática','♟️'],['Mente Gêmea','🧠'],['Eco do Silêncio','🔕'],['Olho do Estrategista','🧿'],['Tempo Dilatado','⌛'],['APEX DO FOCO','🏆']],
+    carisma: [['Sorriso Magnético','😊'],['Olhar Firme','👀'],['Eloquência','🎤'],['Rede de Aliados','🕸️'],['Voz Inspiradora','🎶'],['Negociador','⚖️'],['Magnetismo','🧲'],['Coroa Invisível','👑'],['Carisma Lendário','🌟'],['Eco da Multidão','📢'],['APEX DO CARISMA','🏆']],
+    disciplina: [['Horário Sagrado','🕰️'],['Corrente Quebrada','⛓️'],['Madrugador','🌅'],['Foco no Processo','📋'],['Fogo Interno','🔥'],['Sem Atalhos','🧱'],['Palavra Cumprida','📜'],['Mestre da Rotina','🗓️'],['Vontade de Ferro','⚙️'],['Eterno Retorno','🔁'],['APEX DA DISCIPLINA','🏆']]
+};
+Object.keys(ARVORE_LONG).forEach(function(attr) {
+    const lbl = ({ forca: 'Força', vitalidade: 'Vitalidade', foco: 'Foco', carisma: 'Carisma', disciplina: 'Disciplina' })[attr];
+    ARVORE_LONG[attr].forEach(function(d, i) {
+        const apex = i === 10, tier = apex ? 9 : 4 + (i >> 1), side = apex ? 0 : (i % 2 ? 1 : -1), suf = i % 2 ? 'b' : 'a';
+        const id = attr + '_' + (apex ? 'apex' : tier + suf);
+        ARVORE_TREE_NODES.push({ id: id, nome: d[0], icon: d[1], nivel: ARVORE_LONG_LEVELS[i], fase: tier + 1, reqNivel: ARVORE_LONG_LEVELS[i],
+            atributo: attr, tier: tier, side: side,
+            quote: apex ? 'O topo de ' + lbl + ' é só o começo de outra jornada.' : 'Mais um degrau na trilha de ' + lbl + '. Não olhe para baixo.',
+            virtudes: apex ? 'Maestria total em ' + lbl + '.' : 'Domínio avançado de ' + lbl + ' (nível ' + ARVORE_LONG_LEVELS[i] + ').' });
+        if (apex) { ARVORE_CONNECTIONS.push([attr + '_8a', id]); ARVORE_CONNECTIONS.push([attr + '_8b', id]); }
+        else ARVORE_CONNECTIONS.push([tier === 4 ? attr + '_3' + suf : attr + '_' + (tier - 1) + suf, id]);
+    });
+});
+ARVORE_TREE_NODES.push({ id: 'apex_global', nome: 'O ÁPICE', icon: '👁️‍🗨️', nivel: 250, fase: 11, reqNivel: 250, atributo: null, tier: 'top',
+    quote: 'Poucos chegam. Quem chega, já não é o mesmo que começou.', virtudes: 'A evolução completa: todos os atributos dominados.' });
+Object.keys(ARVORE_LONG).forEach(function(attr) { ARVORE_CONNECTIONS.push([attr + '_apex', 'apex_global']); });
+
 // ---- ARQUITETO PERSONAGEM FRAGMENTS ----
 const AP_FRAGMENTS = [
     { nome: 'Fragmento da Origem',  emoji: '💫', desc: 'O Arquiteto foi um humano comum antes de despertar. Como você.',               reqNivel: 1   },
@@ -11038,9 +11065,9 @@ function filterArvoreAttr(key) {
 
 // Mapa em leque: Caminho Desconhecido no centro; cada atributo sai em um ângulo. O mapa é maior que a tela (arrastar/zoom).
 const ARVORE_ANGLES = { forca: -76, vitalidade: -38, foco: 0, carisma: 38, disciplina: 76 };
-const ARVORE_RADII = { 1: 150, 2: 290, 3: 430 };
+const ARVORE_RADII = { 1: 150, 2: 290, 3: 430, 4: 570, 5: 710, 6: 850, 7: 990, 8: 1130, 9: 1270 };
 const ARVORE_SIDE_DEG = 11;
-const ARVORE_MAP = { w: 1500, h: 960, hubX: 750, hubY: 690, rootY: 830 };
+const ARVORE_MAP = { w: 2760, h: 1860, hubX: 1380, hubY: 1640, rootY: 1780, topR: 1500 };
 let _arvoreSel = null;
 const _arvView = { x: 0, y: 0, s: 0.9, bound: false };
 
@@ -11066,6 +11093,7 @@ function renderArvoreTree() {
         let p, r = 0, deg = 0, size = 58;
         if (n.tier === 'root') { p = { x: M.hubX, y: M.rootY }; size = 88; }
         else if (n.tier === 'hub') { p = { x: M.hubX, y: M.hubY }; size = 66; }
+        else if (n.tier === 'top') { p = { x: M.hubX, y: M.hubY - M.topR }; size = 96; }
         else {
             r = ARVORE_RADII[n.tier];
             deg = ARVORE_ANGLES[n.atributo] + n.side * ARVORE_SIDE_DEG;
@@ -11082,15 +11110,15 @@ function renderArvoreTree() {
 
     // fundo: arcos finos interrompidos, raios e pontos nas intersecções
     let bg = '';
-    [150, 290, 430, 530, 640].forEach(function(r, i) {
+    [150, 290, 430, 570, 710, 850, 990, 1130, 1270, 1400].forEach(function(r, i) {
         const a = _arvPolar(r, -96), b = _arvPolar(r, 96);
         const dash = i < 3 ? (r * 0.7) + ' 10 ' + (r * 0.25) + ' 18' : (r * 0.5) + ' 6 ' + (r * 0.15) + ' 30';
-        bg += '<path d="M' + a.x + ' ' + a.y + ' A' + r + ' ' + r + ' 0 0 1 ' + b.x + ' ' + b.y + '" fill="none" stroke="rgba(200,225,255,' + (i < 3 ? 0.22 : 0.15) + ')" stroke-width="1.2" stroke-dasharray="' + dash + '"/>';
+        bg += '<path d="M' + a.x + ' ' + a.y + ' A' + r + ' ' + r + ' 0 0 1 ' + b.x + ' ' + b.y + '" fill="none" stroke="rgba(200,225,255,' + (i < 3 ? 0.22 : 0.12) + ')" stroke-width="1.2" stroke-dasharray="' + dash + '"/>';
     });
     Object.keys(ARVORE_ANGLES).forEach(function(k) {
-        const e = _arvPolar(640, ARVORE_ANGLES[k]);
+        const e = _arvPolar(1400, ARVORE_ANGLES[k]);
         bg += '<line x1="' + M.hubX + '" y1="' + M.hubY + '" x2="' + e.x + '" y2="' + e.y + '" stroke="rgba(200,225,255,0.07)"/>';
-        [530, 640].forEach(function(r) { const d = _arvPolar(r, ARVORE_ANGLES[k]); bg += '<circle cx="' + d.x + '" cy="' + d.y + '" r="4" fill="rgba(210,230,255,0.55)"/>'; });
+        [850, 1130, 1400].forEach(function(r) { const d = _arvPolar(r, ARVORE_ANGLES[k]); bg += '<circle cx="' + d.x + '" cy="' + d.y + '" r="4" fill="rgba(210,230,255,0.55)"/>'; });
     });
 
     // ligações em curva; acendem até o último nó desbloqueado
@@ -11099,7 +11127,7 @@ function renderArvoreTree() {
         const a = pos[pair[0]], b = pos[pair[1]];
         const lit = b.unlocked && a.on && b.on;
         let d;
-        if (a.n.tier === 'root') d = 'M' + a.x + ' ' + a.y + ' L' + b.x + ' ' + b.y;
+        if (a.n.tier === 'root' || b.n.tier === 'top') d = 'M' + a.x + ' ' + a.y + ' L' + b.x + ' ' + b.y;
         else {
             const c = a.n.tier === 'hub' ? _arvPolar((b.r) * 0.55, 0) : _arvPolar(a.r + (b.r - a.r) * 0.55, a.deg);
             d = 'M' + a.x + ' ' + a.y + ' Q' + c.x + ' ' + c.y + ' ' + b.x + ' ' + b.y;
@@ -11124,7 +11152,7 @@ function renderArvoreTree() {
     });
     html += '<div class="ar-cap" style="left:' + M.hubX + 'px;top:' + (M.rootY + 52) + 'px">O INÍCIO</div>';
     Object.keys(ARVORE_ANGLES).forEach(function(k) {
-        const e = _arvPolar(ARVORE_RADII[3] + 110, ARVORE_ANGLES[k]);
+        const e = _arvPolar(ARVORE_RADII[9] + 110, ARVORE_ANGLES[k]);
         html += '<div class="ar-bl" style="left:' + e.x + 'px;top:' + e.y + 'px;--c:' + ARVORE_ATTRS[k].cor + '">' + ARVORE_ATTRS[k].label.toUpperCase() + '</div>';
     });
     nodesDiv.innerHTML = html;
@@ -11204,7 +11232,7 @@ function arvoreCenterView() {
 
 function arvoreZoomAt(px, py, ns) {
     const v = _arvView;
-    ns = Math.max(0.45, Math.min(1.8, ns));
+    ns = Math.max(0.22, Math.min(1.8, ns));
     v.x = px - (px - v.x) * (ns / v.s);
     v.y = py - (py - v.y) * (ns / v.s);
     v.s = ns;
