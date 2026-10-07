@@ -2984,6 +2984,7 @@ function shouldTaskAppearToday(task, today = new Date()) {
     if (!task.ativo) return false;
 
     const todayKey = getDateKey(today);
+    if (task.endDate && todayKey > getDateKey(task.endDate)) return false; // fora do período da missão
 
     // MISSÃO ÚNICA: aparece de startDate até ser concluída uma vez
     if (task.tipo === 'missao' && task.unique) {
@@ -3790,7 +3791,7 @@ function initTabNavigation() {
                     if (targetTab === 'arvoreEvolucao' && typeof initArvoreEvolucao === 'function') {
                         setTimeout(() => initArvoreEvolucao(), 90);
                     }
-                    if (targetTab === 'arquitetoPersonagem' && typeof renderArquitetoPersonagem === 'function') {
+                    if ((targetTab === 'arquitetoPersonagem' || targetTab === 'arquiteto') && typeof renderArquitetoPersonagem === 'function') {
                         setTimeout(() => renderArquitetoPersonagem(), 90);
                     }
 
@@ -9265,13 +9266,12 @@ const OPENROUTER_MODELS_FREE = [
 
 let arquitetoChatHistory = [];
 
+// A IA roda no proxy do Sistema (Edge Function "architect"): não há mais chave no aparelho; "chave" = estar logado.
 function getOpenRouterKey() {
-    return localStorage.getItem('openRouterApiKey') || '';
+    return (window.SysAuth && SysAuth.loggedIn()) ? 'proxy' : '';
 }
 
-function saveOpenRouterKey(key) {
-    localStorage.setItem('openRouterApiKey', key.trim());
-}
+function saveOpenRouterKey() { /* obsoleto: a chave fica no servidor */ }
 
 function loadArquitetoHistory() {
     try {
@@ -9289,143 +9289,34 @@ function saveArquitetoHistory() {
     localStorage.setItem('arquitetoChatHistory', JSON.stringify(arquitetoChatHistory));
 }
 
-function buildArquitetoSystemPrompt() {
-    const d = gameSystem.data;
-    const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-
-    const startOfWeek = new Date();
-    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
-    startOfWeek.setHours(0, 0, 0, 0);
-    const treinos = (d.treinosSemana || []).filter(t => new Date(t.data) >= startOfWeek).length;
-
-    // Schema atual: missão "pendente" = sem completion para hoje (e não única já feita).
-    const todayKey = localDateKey(new Date());
-    const missoesPendentes = (d.missoes || []).filter(m => {
-        const completions = Array.isArray(m.completions) ? m.completions : [];
-        const isUnique = m.recurrence === 'unique' || m.recorrencia === 'unique';
-        if (isUnique) return completions.length === 0 && !m.concluida;
-        return !completions.includes(todayKey) && !m.concluida;
-    }).length;
-    const attrs = d.atributos || {};
-    const classeNome = d.classe ? (d.classe.charAt(0).toUpperCase() + d.classe.slice(1)) : 'Nenhuma';
-
-    return `Você é o Arquiteto — a consciência do Sistema de Evolução Pessoal, inspirado no universo Solo Leveling.
-Você é sábio, misterioso e motivador. Fala como um mentor que observa a jornada do caçador de um plano superior.
-Você conhece todos os dados do sistema e guia a evolução do usuário com precisão.
-
-═══ DADOS DO CAÇADOR ═══
-Nome: ${d.nome || 'HUNTER'} | Apelido: ${d.apelido || 'Iniciante'}
-Nível: ${d.nivel} | Rank: ${d.rank} | Classe: ${classeNome}
-EXP: ${d.exp}/${d.expNecessaria} | HP: ${d.hp}/${d.hpMax} | MP: ${d.mp}/${d.mpMax}
-Moedas: G${d.moedas}
-
-═══ ATRIBUTOS ═══
-Força: ${Math.floor(attrs.forca || 0)} | Sabedoria: ${Math.floor(attrs.sabedoria || 0)}
-Foco: ${Math.floor(attrs.foco || 0)} | Vitalidade: ${Math.floor(attrs.vitalidade || 0)}
-Disciplina: ${Math.floor(attrs.disciplina || 0)} | Carisma: ${Math.floor(attrs.carisma || 0)}
-
-═══ PROGRESSO ═══
-Missões pendentes: ${missoesPendentes}
-Treinos esta semana: ${treinos}/${d.treinoMeta || 5}
-Habilidades: ${(d.habilidades || []).length} | Runas: ${(d.runas || []).length}
-Hábitos ativos: ${(d.habitos || []).length} | Penalidades: ${(d.penalidades || []).filter(p => !p.cumprida).length}
-
-Data: ${hoje}
-
-═══ INSTRUÇÕES ═══
-- Responda SEMPRE em português do Brasil
-- Seja conciso: máximo 3 parágrafos curtos
-- Tom: mentor sábio e misterioso, com toques do universo Solo Leveling
-- Use os dados do sistema para conselhos personalizados e práticos
-- Nunca invente dados não fornecidos acima`;
-}
-
-async function callOpenRouter(messages, modelIndex) {
-    if (modelIndex === undefined) modelIndex = 0;
-    const apiKey = getOpenRouterKey();
-    if (!apiKey) {
-        const e = new Error('Chave da API não configurada. Configure sua chave do OpenRouter acima.');
+async function callOpenRouter(messages) {
+    if (!(window.SysAuth && SysAuth.loggedIn())) {
+        const e = new Error('Faça login para falar com o Arquiteto.');
         e.code = 'NO_KEY';
         throw e;
     }
-    if (modelIndex >= OPENROUTER_MODELS_FREE.length) {
-        throw new Error('Todos os modelos gratuitos estão indisponíveis agora. Tente novamente em alguns minutos.');
-    }
-
-    const model = OPENROUTER_MODELS_FREE[modelIndex];
     let res;
     try {
-        res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        res = await fetch(SysAuth.fnUrl('architect'), {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + apiKey,
-                'HTTP-Referer': window.location.href,
-                'X-Title': 'System Level Up - Arquiteto IA' // ASCII: travessão (U+2014) invalida o header e quebra o fetch
-            },
-            body: JSON.stringify({ model, messages, max_tokens: 600, temperature: 0.8 })
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await SysAuth.token(), 'apikey': SysAuth.anon() },
+            body: JSON.stringify({ messages, max_tokens: 700 })
         });
     } catch {
-        // Network error — try next model
-        return callOpenRouter(messages, modelIndex + 1);
+        throw new Error('Sem conexão com o Arquiteto. Verifique sua internet.');
     }
-
+    const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-        const status = res.status;
-        if (status === 401 || status === 403) {
-            const e = new Error('Chave da API inválida ou sem créditos. Verifique em openrouter.ai.');
-            e.code = 'INVALID_KEY';
-            throw e;
-        }
-        // Rate limit or server error — try next model
-        if (status === 429 || status >= 500) {
-            return callOpenRouter(messages, modelIndex + 1);
-        }
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error?.message || 'Erro ' + status);
+        const e = new Error(data.error || 'Erro ' + res.status);
+        e.code = data.code;
+        throw e;
     }
-
-    const data = await res.json();
-    const modelUsed = (data.model || model).split('/').pop().split(':')[0];
     const badge = document.getElementById('arqModelBadge');
-    if (badge) badge.textContent = modelUsed;
-
-    return data.choices?.[0]?.message?.content || '';
+    if (badge) badge.textContent = String(data.model || '').split('/').pop().split(':')[0];
+    return data.content || '';
 }
 
-function renderArquitetoMessages() {
-    const container = document.getElementById('arqMessages');
-    if (!container) return;
-    container.innerHTML = '';
-
-    arquitetoChatHistory.forEach(function(msg) {
-        const div = document.createElement('div');
-        div.className = 'arq-msg arq-msg--' + msg.role;
-
-        if (msg.role === 'assistant') {
-            div.innerHTML =
-                '<div class="arq-msg-avatar" aria-hidden="true">' +
-                    '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">' +
-                        '<path d="M10 2l1.5 6.5L18 10l-6.5 1.5L10 18l-1.5-6.5L2 10l6.5-1.5z"/>' +
-                        '<circle cx="10" cy="10" r="1.8" fill="currentColor" fill-opacity="0.35"/>' +
-                    '</svg>' +
-                '</div>' +
-                '<div class="arq-msg-bubble">' +
-                    '<div class="arq-msg-label">ARQUITETO</div>' +
-                    '<div class="arq-msg-text">' + escapeHtml(msg.content).replace(/\n/g, '<br>') + '</div>' +
-                '</div>';
-        } else {
-            div.innerHTML =
-                '<div class="arq-msg-bubble">' +
-                    '<div class="arq-msg-text">' + escapeHtml(msg.content).replace(/\n/g, '<br>') + '</div>' +
-                '</div>';
-        }
-
-        container.appendChild(div);
-    });
-
-    container.scrollTop = container.scrollHeight;
-}
+// buildArquitetoSystemPrompt, renderArquitetoMessages e sendArquitetoMessage vivem em System_arquiteto.js
 
 function showArquitetoTyping() {
     const container = document.getElementById('arqMessages');
@@ -9450,51 +9341,6 @@ function showArquitetoTyping() {
 function hideArquitetoTyping() {
     const el = document.getElementById('arqTypingIndicator');
     if (el) el.remove();
-}
-
-async function sendArquitetoMessage(text) {
-    const trimmed = (text || '').trim();
-    if (!trimmed) return;
-
-    arquitetoChatHistory.push({ role: 'user', content: trimmed, timestamp: Date.now() });
-    saveArquitetoHistory();
-    renderArquitetoMessages();
-
-    const suggestions = document.getElementById('arqSuggestions');
-    if (suggestions) suggestions.style.display = 'none';
-
-    showArquitetoTyping();
-
-    const input = document.getElementById('arqChatInput');
-    const btn = document.getElementById('arqSendBtn');
-    if (input) { input.value = ''; input.style.height = 'auto'; input.disabled = true; }
-    if (btn) btn.disabled = true;
-
-    try {
-        const systemMsg = { role: 'system', content: buildArquitetoSystemPrompt() };
-        const recentHistory = arquitetoChatHistory.slice(-20).map(function(m) {
-            return { role: m.role, content: m.content };
-        });
-
-        const reply = await callOpenRouter([systemMsg].concat(recentHistory));
-        hideArquitetoTyping();
-        arquitetoChatHistory.push({ role: 'assistant', content: reply, timestamp: Date.now() });
-        saveArquitetoHistory();
-        renderArquitetoMessages();
-
-    } catch (err) {
-        hideArquitetoTyping();
-        if (err.code === 'NO_KEY' || err.code === 'INVALID_KEY') {
-            const banner = document.getElementById('arqApikeyBanner');
-            if (banner) banner.style.display = '';
-        }
-        arquitetoChatHistory.push({ role: 'assistant', content: '⚠ ' + err.message, timestamp: Date.now() });
-        saveArquitetoHistory();
-        renderArquitetoMessages();
-    } finally {
-        if (input) input.disabled = false;
-        if (btn) btn.disabled = false;
-    }
 }
 
 function addArquitetoGreeting() {
@@ -9639,38 +9485,7 @@ function recusarHabilidadeProposta(idx) {
 function initArquitetoIA() {
     loadArquitetoHistory();
 
-    const banner = document.getElementById('arqApikeyBanner');
-    const keyInput = document.getElementById('arqApikeyInput');
-    const keySaveBtn = document.getElementById('arqApikeySaveBtn');
-    const changeKeyBtn = document.getElementById('arqChangeKeyBtn');
     const hasKey = !!getOpenRouterKey();
-
-    if (banner) banner.style.display = hasKey ? 'none' : '';
-
-    if (keySaveBtn) {
-        keySaveBtn.addEventListener('click', function() {
-            const val = (keyInput ? keyInput.value : '').trim();
-            if (!val) return;
-            saveOpenRouterKey(val);
-            if (banner) banner.style.display = 'none';
-            if (arquitetoChatHistory.length === 0) addArquitetoGreeting();
-        });
-        if (keyInput) {
-            keyInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') { e.preventDefault(); keySaveBtn.click(); }
-            });
-        }
-    }
-
-    if (changeKeyBtn) {
-        changeKeyBtn.addEventListener('click', function() {
-            if (banner) {
-                banner.style.display = '';
-                if (keyInput) keyInput.value = getOpenRouterKey();
-                if (keyInput) keyInput.focus();
-            }
-        });
-    }
 
     const chatInput = document.getElementById('arqChatInput');
     const sendBtn = document.getElementById('arqSendBtn');

@@ -246,6 +246,7 @@
         ready: hashJob,
         login: (email, pass) => auth('login', email, pass),
         signup: (email, pass) => auth('signup', email, pass),
+        token, anon: () => cfg().anon, fnUrl: n => cfg().url.replace(/\/$/, '') + '/functions/v1/' + n,
         recover, setPassword, google: googleStart, finishRecovery: () => afterLogin(cfg().uid)
     };
 

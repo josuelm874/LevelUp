@@ -11172,3 +11172,24 @@ body.sys-app { padding-bottom: env(safe-area-inset-bottom, 0px); padding-top: en
 .sl-msg.sl-bad { color: #ff7b8a; }
 .sl-links { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; }
 .sl-links button { background: none; border: 0; padding: 6px 0; color: #7fc6ff; font: 600 .95rem Rajdhani, sans-serif; text-decoration: underline; cursor: pointer; }
+
+/* ===== Arquiteto IA: abas, retrato, cartões de ação ===== */
+.arq-header-portrait { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(160,140,255,.55); box-shadow: 0 0 14px rgba(140,100,255,.45); flex-shrink: 0; }
+.arq-tabs { display: flex; gap: 8px; padding: 6px 14px 4px; }
+.arq-tab { flex: 1; padding: 8px 10px; font: 700 .7rem var(--sl-font-display); letter-spacing: .12em; color: rgba(255,255,255,.55); background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; cursor: pointer; }
+.arq-tab.active { color: #fff; border-color: rgba(160,140,255,.7); background: rgba(120,90,255,.18); box-shadow: 0 0 12px rgba(120,90,255,.3); }
+.arq-pane[hidden] { display: none; }
+.arq-pane { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow-y: auto; }
+#arqPaneChat { overflow: hidden; }
+.arq-msg-avatar--img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid rgba(160,140,255,.5); }
+.ap-portrait-img { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; object-position: center 30%; border: 2px solid rgba(160,140,255,.6); box-shadow: 0 0 30px rgba(120,90,255,.5), 0 0 60px rgba(120,90,255,.25); }
+.arq-act { margin-top: 10px; padding: 10px 12px; border: 1px solid rgba(160,140,255,.45); border-radius: 12px; background: rgba(20,14,50,.7); }
+.arq-act-title { font: 700 .74rem var(--sl-font-display); letter-spacing: .08em; color: #d9ccff; margin-bottom: 6px; }
+.arq-act-row { font-size: .74rem; line-height: 1.45; color: rgba(255,255,255,.75); }
+.arq-act-btns { display: flex; gap: 8px; margin-top: 10px; }
+.arq-act-btns button { flex: 1; padding: 9px; font: 700 .68rem var(--sl-font-display); letter-spacing: .1em; border-radius: 8px; cursor: pointer; min-height: 40px; }
+.arq-act-ok { color: #fff; background: rgba(120,90,255,.45); border: 1px solid rgba(180,160,255,.8); }
+.arq-act-no { color: rgba(255,255,255,.65); background: transparent; border: 1px solid rgba(255,255,255,.25); }
+.arq-act-state { margin-top: 8px; font-size: .72rem; color: rgba(255,255,255,.5); }
+.arq-act-state--ok { color: #8be9a8; }
+.arq-act-state--bad { color: #ff8a8a; }
