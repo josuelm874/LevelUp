@@ -10852,7 +10852,7 @@ function renderProgresso() {
                 <div class="pg-stat-value">${missoesHojeCount}</div>
             </div>
             <div class="pg-stat-label">MISSÕES CONCLUÍDAS HOJE</div>
-            <div class="pg-stat-sub">Alinhado ao frame de progresso</div>
+            <div class="pg-stat-sub">Concluídas no dia</div>
         </div>
         <div class="pg-stat-card pg-stat-card--amber">
             <div class="pg-stat-top">

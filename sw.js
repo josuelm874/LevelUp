@@ -1,6 +1,6 @@
 // Cache offline: app shell (cache-first, versão) + fontes Google (stale-while-revalidate).
-const V = 'sys-v9';
-const SHELL = ['System.html', 'System_script.js', 'System_style.css', 'System_calendario.css','System_sync.js', 'System_mobile.js', 'System_extras.js', 'System_arquiteto.js', 'System_missoes.js', 'System_loja.js', 'System_calendario.js', 'System_login.js', 'assets/logo.png', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
+const V = 'sys-v10';
+const SHELL = ['System.html', 'System_script.js', 'System_style.css', 'System_calendario.css','System_sync.js', 'System_mobile.js', 'System_extras.js', 'System_arquiteto.js', 'System_missoes.js', 'System_loja.js', 'System_calendario.js', 'System_ajustes.js', 'System_arena.js','System_ajustes.css','System_login.js', 'assets/logo.png', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
     e.waitUntil(caches.open(V).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

@@ -55,7 +55,7 @@
                 const state = done ? 'done' : key < today ? 'missed' : key === today ? 'pending' : 'planned';
                 const rw = t.rewards || {};
                 const sub = [];
-                if (rw.xp) sub.push('+' + rw.xp + ' XP');
+                if (rw.exp || rw.xp) sub.push('+' + (rw.exp || rw.xp) + ' XP');
                 if (rw.moedas || rw.coins) sub.push((rw.moedas || rw.coins) + ' G');
                 if (t.idealPeriod && t.idealPeriod !== 'flex') sub.push(t.idealPeriod);
                 if (t.unique && t.endDate && String(t.endDate).slice(0, 10) === key && String(t.startDate || '').slice(0, 10) !== key) sub.unshift('PRAZO FINAL');
